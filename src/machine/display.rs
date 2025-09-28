@@ -12,6 +12,7 @@ pub struct Display {
 
 #[derive(Debug, Error)]
 #[must_use]
+/// Enum for all possible display errors
 pub enum DisplayError {}
 
 impl Display {

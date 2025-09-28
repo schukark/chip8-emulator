@@ -12,6 +12,7 @@ pub struct Keypad {
 
 #[derive(Debug, Error)]
 #[must_use]
+/// Enum for all possible keypad errors
 pub enum KeypadError {}
 
 impl Keypad {

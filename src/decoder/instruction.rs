@@ -221,6 +221,7 @@ pub enum Instruction {
 }
 
 #[derive(Debug, Error)]
+/// Enum for all possible decode errors
 pub enum DecodeError {
     #[error("Command {0:#04X} is incorrect")]
     /// The command's bytes don't correspond to any correct instruction
