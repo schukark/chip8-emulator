@@ -21,7 +21,7 @@ I highly recommend to pay a visit (and drop a star) to this repo full of roms:
 
 - [ ] Write better unit tests
   - [x] Test Instructions fully
-  - [ ] Test CPU
+  - [x] Test CPU
   - [ ] Test Memory
   - [ ] Test Display
   - [ ] Test Keypad
