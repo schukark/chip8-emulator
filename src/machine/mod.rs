@@ -90,7 +90,7 @@ impl Chip8 {
     /// Run one fetch-decode-execute cycle
     pub fn step(&mut self) -> Result<(), Chip8Error> {
         let pc = self.cpu.get_program_counter();
-        let opcode = self.memory.read_word(pc);
+        let opcode = self.memory.read_word(pc)?;
         let instruction = Instruction::try_from(opcode)?;
 
         match self.execute(instruction) {
@@ -234,7 +234,8 @@ impl Chip8 {
                 let mut sprite = vec![0_u8; height.into_inner() as usize];
 
                 for i in 0..height.into_inner() {
-                    sprite[i as usize] = self.memory.read_byte(self.cpu.get_address() + i as u16);
+                    sprite[i as usize] =
+                        self.memory.read_byte(self.cpu.get_address() + i as u16)?;
                 }
 
                 let vx = *self.cpu.vx(x);
@@ -304,7 +305,7 @@ impl Chip8 {
             Instruction::LoadRegisters { x } => {
                 for i in 0..=x.into_inner() {
                     *self.cpu.vx(Index::try_new(i).unwrap()) =
-                        self.memory.read_byte(self.cpu.get_address() + i as u16);
+                        self.memory.read_byte(self.cpu.get_address() + i as u16)?;
                 }
                 ExecResult::Advance
             }
