@@ -20,7 +20,7 @@ I highly recommend to pay a visit (and drop a star) to this repo full of roms:
 ## TBD
 
 - [ ] Write better unit tests
-  - [ ] Test Instructions fully
+  - [x] Test Instructions fully
   - [ ] Test CPU
   - [ ] Test Memory
   - [ ] Test Display
