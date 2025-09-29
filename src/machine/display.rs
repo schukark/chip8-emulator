@@ -47,4 +47,9 @@ impl Display {
         }
         collision
     }
+
+    /// Get current display state
+    pub fn get_state(&self) -> [[bool; 64]; 32] {
+        self.pixels
+    }
 }
