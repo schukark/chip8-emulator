@@ -36,6 +36,9 @@ pub enum MemoryError {
     #[error("Reserved memory access")]
     /// Addresses before 0x200 are reserved and can't be overwritten
     PermissionDenied,
+    #[error("Sprite index out of range")]
+    /// There are exactly 16 sprites (0..=F), accesing other indices is erroneous
+    IncorrectSprite,
 }
 
 impl Memory {
@@ -50,6 +53,17 @@ impl Memory {
         }
 
         Self { data }
+    }
+
+    /// Fetch sprite address from reserved memory
+    ///
+    /// Returns error if the sprite asked is not in 0..=F
+    pub fn read_sprite_address(&self, digit: u8) -> Result<u16, MemoryError> {
+        if digit > 0xF {
+            Err(MemoryError::IncorrectSprite)
+        } else {
+            Ok(digit as u16 * 5)
+        }
     }
 
     /// Fetch a byte from address
