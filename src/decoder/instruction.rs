@@ -6,6 +6,7 @@ use thiserror::Error;
 use crate::types::{Address, Index, SpriteHeight};
 use crate::{op_addr, op_reg1, op_reg2, op_reg3, op_regconst};
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 /// All the opcodes for chip8 emulator
 ///
 /// NNN - 12-bit address
