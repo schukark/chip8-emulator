@@ -228,12 +228,18 @@ impl Chip8 {
                 *self.cpu.vx(x) = rand & value;
                 ExecResult::Advance
             }
-            Instruction::DrawSprite {
-                x: _,
-                y: _,
-                height: _,
-            } => {
-                unimplemented!("Display is not yet implemented")
+            Instruction::DrawSprite { x, y, height } => {
+                let mut sprite = vec![0_u8; height.into_inner() as usize];
+
+                for i in 0..height.into_inner() {
+                    sprite[i as usize] = self.memory.read_byte(self.cpu.get_address() + i as u16);
+                }
+
+                let vx = *self.cpu.vx(x);
+                let vy = *self.cpu.vx(y);
+                self.display.draw_sprite(&sprite, vx, vy);
+
+                ExecResult::Advance
             }
             Instruction::KeyPressedSkip { x: _ } => {
                 unimplemented!("Keypad is not yet implemented")
@@ -273,7 +279,7 @@ impl Chip8 {
                 let ones = vx % 10;
 
                 self.memory
-                    .load(self.cpu.get_address(), &[hundreds, tens, ones]);
+                    .load(self.cpu.get_address(), &[hundreds, tens, ones])?;
                 ExecResult::Advance
             }
             Instruction::DumpRegisters { x } => {
@@ -281,7 +287,7 @@ impl Chip8 {
                     self.memory.load(
                         self.cpu.get_address() + i as u16,
                         &[*self.cpu.vx(Index::try_new(i).unwrap())],
-                    );
+                    )?;
                 }
                 ExecResult::Advance
             }
