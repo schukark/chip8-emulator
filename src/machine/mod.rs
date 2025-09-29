@@ -66,6 +66,9 @@ pub enum Chip8Error {
 }
 
 impl Chip8 {
+    /// VF register is used a lot here, so it is a predefined constant
+    const VF: Index = unsafe { Index::new_unchecked(0xF) };
+
     /// Create a new Chip8
     pub fn new() -> Self {
         Self {
@@ -78,7 +81,7 @@ impl Chip8 {
 
     /// Load the program for execution, starting at address 0x200
     pub fn load_program(&mut self, program: &[u8]) -> Result<(), Chip8Error> {
-        self.memory.load(0x200, program);
+        self.memory.load(0x200, program)?;
         self.cpu.set_program_counter(0x200)?;
 
         Ok(())
@@ -177,19 +180,18 @@ impl Chip8 {
                 let vx = *self.cpu.vx(x);
                 let vy = *self.cpu.vx(y);
                 *self.cpu.vx(x) += vy;
-                *self.cpu.vx(Index::try_new(0xF).unwrap()) =
-                    ((vx as u16) + (vy as u16) > 255) as u8;
+                *self.cpu.vx(Chip8::VF) = ((vx as u16) + (vy as u16) > 255) as u8;
                 ExecResult::Advance
             }
             Instruction::SubAssignReg { x, y } => {
                 let vx = *self.cpu.vx(x);
                 let vy = *self.cpu.vx(y);
                 *self.cpu.vx(x) -= vy;
-                *self.cpu.vx(Index::try_new(0xF).unwrap()) = (vx >= vy) as u8;
+                *self.cpu.vx(Chip8::VF) = (vx >= vy) as u8;
                 ExecResult::Advance
             }
             Instruction::RShift { x, y: _y } => {
-                *self.cpu.vx(Index::try_new(0xF).unwrap()) = *self.cpu.vx(x) & 1;
+                *self.cpu.vx(Chip8::VF) = *self.cpu.vx(x) & 1;
                 *self.cpu.vx(x) >>= 1;
                 ExecResult::Advance
             }
@@ -197,11 +199,11 @@ impl Chip8 {
                 let vx = *self.cpu.vx(x);
                 let vy = *self.cpu.vx(y);
                 *self.cpu.vx(x) = vy - vx;
-                *self.cpu.vx(Index::try_new(0xF).unwrap()) = (vy >= vx) as u8;
+                *self.cpu.vx(Chip8::VF) = (vy >= vx) as u8;
                 ExecResult::Advance
             }
             Instruction::LShift { x, y: _y } => {
-                *self.cpu.vx(Index::try_new(0xF).unwrap()) = (*self.cpu.vx(x) >> 7) & 1;
+                *self.cpu.vx(Chip8::VF) = (*self.cpu.vx(x) >> 7) & 1;
                 *self.cpu.vx(x) <<= 1;
                 ExecResult::Advance
             }
@@ -237,7 +239,9 @@ impl Chip8 {
 
                 let vx = *self.cpu.vx(x);
                 let vy = *self.cpu.vx(y);
-                self.display.draw_sprite(&sprite, vx, vy);
+                let collision = self.display.draw_sprite(&sprite, vx, vy);
+
+                *self.cpu.vx(Chip8::VF) = collision as u8;
 
                 ExecResult::Advance
             }
@@ -268,8 +272,14 @@ impl Chip8 {
                 self.cpu.advance_address(vx as u16)?;
                 ExecResult::Advance
             }
-            Instruction::SetSpriteAddr { x: _ } => {
-                unimplemented!("Display is not yet implemented")
+            Instruction::SetSpriteAddr { x } => {
+                let digit = *self.cpu.vx(x);
+
+                // & 0x0F guarantees that the sprite index is in required bounds (0..=F)
+                let sprite_addr = self.memory.read_sprite_address(digit)?;
+                self.cpu.set_address(sprite_addr)?;
+
+                ExecResult::Advance
             }
             Instruction::SetBCD { x } => {
                 let vx = *self.cpu.vx(x);
