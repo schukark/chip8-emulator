@@ -6,13 +6,13 @@ use thiserror::Error;
 use crate::types::{Address, Index, SpriteHeight};
 use crate::{op_addr, op_reg1, op_reg2, op_reg3, op_regconst};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 /// All the opcodes for chip8 emulator
 ///
 /// NNN - 12-bit address
 /// NN - 8-bit constant
 /// N - 4-bit constant
 /// X/Y - 4-bit register code (0-F)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Instruction {
     /// 0NNN, call machine code routine
     CallMachineCode {
@@ -221,8 +221,8 @@ pub enum Instruction {
     },
 }
 
-#[derive(Debug, Error)]
 /// Enum for all possible decode errors
+#[derive(Debug, Error)]
 pub enum DecodeError {
     #[error("Command {0:#04X} is incorrect")]
     /// The command's bytes don't correspond to any correct instruction

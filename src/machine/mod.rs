@@ -42,8 +42,8 @@ pub struct Chip8 {
     pub keypad: Keypad,
 }
 
-#[derive(Debug, Error)]
 /// Enum of all possible errors with chip8 instance
+#[derive(Debug, Error)]
 pub enum Chip8Error {
     #[error("Cpu error")]
     /// Cpu error

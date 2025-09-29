@@ -10,9 +10,9 @@ pub struct Display {
     pub pixels: [[bool; 64]; 32],
 }
 
+/// Enum for all possible display errors
 #[derive(Debug, Error)]
 #[must_use]
-/// Enum for all possible display errors
 pub enum DisplayError {}
 
 impl Display {

@@ -29,9 +29,9 @@ const DIGIT_PRITES: [[u8; 5]; 16] = [
     [0xF0, 0x80, 0xF0, 0x80, 0x80], // F
 ];
 
+/// Enum with variants encoding all memory-related errors
 #[derive(Debug, Error)]
 #[must_use]
-/// Enum with variants encoding all memory-related errors
 pub enum MemoryError {
     #[error("Reserved memory access")]
     /// Addresses before 0x200 are reserved and can't be overwritten

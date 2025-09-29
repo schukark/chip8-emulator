@@ -10,9 +10,9 @@ pub struct Keypad {
     pub keys: [bool; 16],
 }
 
+/// Enum for all possible keypad errors
 #[derive(Debug, Error)]
 #[must_use]
-/// Enum for all possible keypad errors
 pub enum KeypadError {}
 
 impl Keypad {
