@@ -25,7 +25,7 @@ I highly recommend to pay a visit (and drop a star) to this repo full of roms:
   - [ ] Test Memory
   - [ ] Test Display
   - [ ] Test Keypad
-- [ ] Implement Display in code
+- [x] Implement Display in code
 - [ ] Implement Display visually
 - [ ] Implement Keypad
 - [ ] Document and check for typos
