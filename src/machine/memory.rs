@@ -11,7 +11,11 @@ pub struct Memory {
 
 #[derive(Debug, Error)]
 #[must_use]
-pub enum MemoryError {}
+pub enum MemoryError {
+    #[error("Reserved memory access")]
+    /// Addresses before 0x200 are reserved and can't be overwritten
+    PermissionDenied,
+}
 
 impl Memory {
     /// Create an empty ram
@@ -32,7 +36,12 @@ impl Memory {
     }
 
     /// Load bytes into ram starting from given address
-    pub fn load(&mut self, start: u16, bytes: &[u8]) {
+    pub fn load(&mut self, start: u16, bytes: &[u8]) -> Result<(), MemoryError> {
+        if start < 0x200 {
+            return Err(MemoryError::PermissionDenied);
+        }
+
         self.data[start as usize..start as usize + bytes.len()].copy_from_slice(bytes);
+        Ok(())
     }
 }
