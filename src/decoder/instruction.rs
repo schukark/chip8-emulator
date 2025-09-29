@@ -55,7 +55,7 @@ pub enum Instruction {
         y: Index,
     },
     /// 6XNN, set VX to NN
-    AssignMem {
+    AssignConst {
         /// register index for VX
         x: Index,
         /// value to assign
@@ -246,7 +246,7 @@ impl Display for Instruction {
                 Instruction::EqConst { x, value } => format!("SE V{x:X}, {value:#02X}"),
                 Instruction::NeqConst { x, value } => format!("SNE V{x:X},{value:#02X}"),
                 Instruction::EqReg { x, y } => format!("SE V{x:X}, VV{y:X}"),
-                Instruction::AssignMem { x, value } => format!("LD V{x:X}, {value:#02X}"),
+                Instruction::AssignConst { x, value } => format!("LD V{x:X}, {value:#02X}"),
                 Instruction::AddAssignMem { x, value } => format!("ADD V{x:X}, {value:#02X}"),
                 Instruction::AssignReg { x, y } => format!("LD V{x:X}, V{y:X}"),
                 Instruction::OrReg { x, y } => format!("OR V{x:X}, V{y:X}"),
@@ -301,7 +301,7 @@ impl TryFrom<u16> for Instruction {
             [3, x, n1, n2] => op_regconst!(EqConst, x, n1, n2),
             [4, x, n1, n2] => op_regconst!(NeqConst, x, n1, n2),
             [5, x, y, 0] => op_reg2!(EqReg, x, y),
-            [6, x, n1, n2] => op_regconst!(AssignMem, x, n1, n2),
+            [6, x, n1, n2] => op_regconst!(AssignConst, x, n1, n2),
             [7, x, n1, n2] => op_regconst!(AddAssignMem, x, n1, n2),
             [8, x, y, 0] => op_reg2!(AssignReg, x, y),
             [8, x, y, 1] => op_reg2!(OrReg, x, y),

@@ -148,7 +148,7 @@ impl Chip8 {
                 }
                 ExecResult::Advance
             }
-            Instruction::AssignMem { x, value } => {
+            Instruction::AssignConst { x, value } => {
                 *self.cpu.vx(x) = value;
                 ExecResult::Advance
             }
