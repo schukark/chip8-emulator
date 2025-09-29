@@ -24,7 +24,12 @@ impl fmt::UpperHex for Address {
 }
 
 /// Newtype struct for register number, they are 4-bit in chip8
+///
+/// new_unchecked is used to reduce boilerplate, VF is used in
+/// 1/3 of instructions and stores as an associated constant to type Chip8
 #[nutype(
+    const_fn,
+    new_unchecked,
     derive(Debug, PartialEq, Eq, Clone, Display, Copy),
     validate(less = 16)
 )]
