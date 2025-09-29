@@ -289,9 +289,6 @@ impl TryFrom<u16> for Instruction {
             (value & 0xF) as u8,
         ];
 
-        // all unwraps are justified, because as per code above,
-        // all parts[i] are in [0; 16)
-        // so they are a correct Register newtype instance
         let instruction = match parts {
             [0, 0, 0xE, 0xE] => Instruction::Return,
             [0, 0, 0xE, 0] => Instruction::ClearDisplay,
@@ -317,7 +314,7 @@ impl TryFrom<u16> for Instruction {
             [0xB, n1, n2, n3] => op_addr!(GotoPlusV0, n1, n2, n3),
             [0xC, x, n1, n2] => op_regconst!(Rand, x, n1, n2),
             [0xD, x, y, n] => op_reg3!(DrawSprite, x, y, n),
-            [0xE, x, 0, 0xE] => op_reg1!(KeyPressedSkip, x),
+            [0xE, x, 9, 0xE] => op_reg1!(KeyPressedSkip, x),
             [0xE, x, 0xA, 1] => op_reg1!(KeyReleasedSkip, x),
             [0xF, x, 0, 7] => op_reg1!(GetDelayTimer, x),
             [0xF, x, 0, 0xA] => op_reg1!(AwaitKeyPress, x),
