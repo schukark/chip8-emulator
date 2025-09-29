@@ -2,6 +2,7 @@
 
 #![warn(missing_docs)]
 #![warn(clippy::missing_docs_in_private_items)]
+#![feature(custom_test_frameworks)]
 
 use std::{env::args, fs::File, io::Read, thread::sleep, time::Duration};
 
