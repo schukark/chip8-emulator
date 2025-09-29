@@ -18,7 +18,7 @@ pub struct Cpu {
     /// Program counter
     program_counter: u16,
     /// Stack pointer
-    stack_pointer: u16,
+    stack_pointer: usize,
     /// Stack
     stack: [u16; 16],
 }
@@ -49,6 +49,7 @@ pub enum CpuError {
 
 impl Cpu {
     /// Create a new CPU
+    #[must_use]
     pub fn new() -> Self {
         Self {
             general: [0; 16],
@@ -127,7 +128,7 @@ impl Cpu {
             return Err(CpuError::StackLimitReached);
         }
 
-        self.stack[self.stack_pointer as usize] = address;
+        self.stack[self.stack_pointer] = address;
         self.stack_pointer += 1;
 
         Ok(())
@@ -141,7 +142,7 @@ impl Cpu {
             return Err(CpuError::StackEmpty);
         }
 
-        let result = self.stack[self.stack_pointer as usize - 1];
+        let result = self.stack[self.stack_pointer - 1];
         self.stack_pointer -= 1;
 
         Ok(result)
@@ -165,5 +166,119 @@ impl Cpu {
     /// Set sound timer
     pub fn set_sound_timer(&mut self, value: u8) {
         self.sound_timer = value;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::types::Index;
+
+    #[test]
+    fn test_new() {
+        let cpu = Cpu::new();
+        assert_eq!(cpu.get_program_counter(), 0x200);
+        assert_eq!(cpu.get_address(), 0);
+        assert_eq!(cpu.get_delay_timer(), 0);
+        assert_eq!(cpu.stack_pointer, 0);
+        assert_eq!(cpu.stack, [0; 16]);
+    }
+
+    mod program_counter {
+        use crate::machine::cpu::Cpu;
+
+        #[test]
+        fn test_advance() {
+            let mut cpu = Cpu::new();
+            assert!(cpu.advance_program_counter(0x100).is_ok());
+            assert_eq!(cpu.get_program_counter(), 0x300);
+        }
+
+        #[test]
+        fn test_set() {
+            let mut cpu = Cpu::new();
+
+            assert!(cpu.set_program_counter(0x100).is_ok());
+            assert_eq!(cpu.get_program_counter(), 0x100);
+        }
+
+        #[test]
+        fn test_out_of_range() {
+            let mut cpu = Cpu::new();
+            assert!(cpu.set_program_counter(0x1000).is_err());
+        }
+    }
+
+    mod address {
+        use crate::machine::cpu::Cpu;
+
+        #[test]
+        fn test_set() {
+            let mut cpu = Cpu::new();
+            assert!(cpu.set_address(0x100).is_ok());
+            assert_eq!(cpu.get_address(), 0x100);
+        }
+
+        #[test]
+        fn test_advance() {
+            let mut cpu = Cpu::new();
+            assert!(cpu.advance_address(0x100).is_ok());
+            assert_eq!(cpu.get_address(), 0x100);
+        }
+
+        #[test]
+        fn test_out_of_range() {
+            let mut cpu = Cpu::new();
+            assert!(cpu.set_address(0x1000).is_err());
+        }
+    }
+
+    mod stack {
+        use crate::machine::cpu::Cpu;
+
+        #[test]
+        fn test_correct_opeation() {
+            let mut cpu = Cpu::new();
+
+            assert!(cpu.stack_push(0x100).is_ok());
+            assert_eq!(cpu.stack_pointer, 1);
+
+            assert!(cpu.stack_push(0x200).is_ok());
+            assert_eq!(cpu.stack_pointer, 2);
+        }
+
+        #[test]
+        fn test_overflow() {
+            let mut cpu = Cpu::new();
+
+            for i in 0..16 {
+                assert!(cpu.stack_push(i as u16).is_ok());
+            }
+            assert!(cpu.stack_push(0x100).is_err());
+        }
+
+        #[test]
+        fn test_empty_error() {
+            let mut cpu = Cpu::new();
+            assert!(cpu.stack_pop().is_err());
+        }
+    }
+
+    #[test]
+    fn test_registers() {
+        let mut cpu = Cpu::new();
+        let index = Index::try_new(0).unwrap();
+        *cpu.vx(index) = 0x10;
+        assert_eq!(cpu.general[0], 0x10);
+    }
+
+    #[test]
+    fn test_timers() {
+        let mut cpu = Cpu::new();
+        cpu.set_delay_timer(0x10);
+        assert_eq!(cpu.get_delay_timer(), 0x10);
+
+        cpu.set_sound_timer(0x20);
+        assert_eq!(cpu.sound_timer, 0x20);
     }
 }
