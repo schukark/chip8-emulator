@@ -70,6 +70,10 @@ impl Keypad {
             error!("Invalid is_pressed key request ", key);
             return Err(KeypadError::NoSuchKey);
         }
+        trace!(
+            "Checking if key ",
+            key, " is pressed, result ", self.keys[key as usize]
+        );
         Ok(self.keys[key as usize])
     }
 
@@ -77,11 +81,16 @@ impl Keypad {
     ///
     /// Even if the key is later released, is still returned
     pub fn last_pressed(&self) -> Option<u8> {
+        trace!(format!(
+            "Checking what key was pressed last, result {:?}",
+            self.last_pressed
+        ));
         self.last_pressed
     }
 
     /// Clear last pressed key
     pub fn clear_last(&mut self) {
+        trace!("Cleared the last pressed key info");
         self.last_pressed = None;
     }
 }

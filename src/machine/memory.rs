@@ -121,7 +121,7 @@ impl Memory {
 
         self.data[start as usize..start as usize + bytes.len()].copy_from_slice(bytes);
         trace!(format!(
-            "Wrote {bytes:#?} to memory from {start} to {}",
+            "Wrote {bytes:?} to memory from {start} to {}",
             start + bytes.len() as u16
         ));
         Ok(())
