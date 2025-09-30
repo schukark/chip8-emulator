@@ -23,7 +23,7 @@ pub struct Cpu {
     /// Stack
     stack: [u16; 16],
     /// Random engine for reproducible randomness
-    random_engine: SmallRng,
+    pub(crate) random_engine: SmallRng,
 }
 
 impl Default for Cpu {
@@ -175,6 +175,16 @@ impl Cpu {
     /// Get randomness
     pub fn random(&mut self) -> u8 {
         self.random_engine.random_range(0x0..=0xFF)
+    }
+
+    /// Tick timers down by one if possible
+    pub fn tick_timers(&mut self) {
+        if self.delay_timer > 0 {
+            self.delay_timer -= 1;
+        }
+        if self.sound_timer > 0 {
+            self.sound_timer -= 1;
+        }
     }
 }
 
