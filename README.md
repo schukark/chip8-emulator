@@ -24,9 +24,9 @@ I highly recommend to pay a visit (and drop a star) to this repo full of roms:
   - [x] Test CPU
   - [x] Test Memory
   - [x] Test Display
-  - [ ] Test Keypad
+  - [x] Test Keypad
 - [x] Implement Display in code
 - [ ] Implement Display visually
-- [ ] Implement Keypad
+- [x] Implement Keypad
 - [ ] Document and check for typos
 - [ ] Run Space Invaders/Pong
