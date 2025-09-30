@@ -67,7 +67,7 @@ impl Cpu {
     }
 
     /// Get program counter
-    pub fn get_program_counter(&self) -> u16 {
+    pub fn program_counter(&self) -> u16 {
         self.program_counter
     }
 
@@ -96,7 +96,7 @@ impl Cpu {
     }
 
     /// Get address register (I)
-    pub fn get_address(&self) -> u16 {
+    pub fn address(&self) -> u16 {
         self.address
     }
 
@@ -158,7 +158,7 @@ impl Cpu {
     }
 
     /// Get delay timer value
-    pub fn get_delay_timer(&self) -> u8 {
+    pub fn delay_timer(&self) -> u8 {
         self.delay_timer
     }
 
@@ -173,7 +173,7 @@ impl Cpu {
     }
 
     /// Get randomness
-    pub fn get_random(&mut self) -> u8 {
+    pub fn random(&mut self) -> u8 {
         self.random_engine.random_range(0x0..=0xFF)
     }
 }
@@ -186,9 +186,9 @@ mod tests {
     #[test]
     fn test_new() {
         let cpu = Cpu::new();
-        assert_eq!(cpu.get_program_counter(), 0x200);
-        assert_eq!(cpu.get_address(), 0);
-        assert_eq!(cpu.get_delay_timer(), 0);
+        assert_eq!(cpu.program_counter(), 0x200);
+        assert_eq!(cpu.address(), 0);
+        assert_eq!(cpu.delay_timer(), 0);
         assert_eq!(cpu.stack_pointer, 0);
         assert_eq!(cpu.stack, [0; 16]);
     }
@@ -200,7 +200,7 @@ mod tests {
         fn test_advance() {
             let mut cpu = Cpu::new();
             assert!(cpu.advance_program_counter(0x100).is_ok());
-            assert_eq!(cpu.get_program_counter(), 0x300);
+            assert_eq!(cpu.program_counter(), 0x300);
         }
 
         #[test]
@@ -208,7 +208,7 @@ mod tests {
             let mut cpu = Cpu::new();
 
             assert!(cpu.set_program_counter(0x100).is_ok());
-            assert_eq!(cpu.get_program_counter(), 0x100);
+            assert_eq!(cpu.program_counter(), 0x100);
         }
 
         #[test]
@@ -225,14 +225,14 @@ mod tests {
         fn test_set() {
             let mut cpu = Cpu::new();
             assert!(cpu.set_address(0x100).is_ok());
-            assert_eq!(cpu.get_address(), 0x100);
+            assert_eq!(cpu.address(), 0x100);
         }
 
         #[test]
         fn test_advance() {
             let mut cpu = Cpu::new();
             assert!(cpu.advance_address(0x100).is_ok());
-            assert_eq!(cpu.get_address(), 0x100);
+            assert_eq!(cpu.address(), 0x100);
         }
 
         #[test]
@@ -285,7 +285,7 @@ mod tests {
     fn test_timers() {
         let mut cpu = Cpu::new();
         cpu.set_delay_timer(0x10);
-        assert_eq!(cpu.get_delay_timer(), 0x10);
+        assert_eq!(cpu.delay_timer(), 0x10);
 
         cpu.set_sound_timer(0x20);
         assert_eq!(cpu.sound_timer, 0x20);
@@ -296,12 +296,12 @@ mod tests {
         let mut cpu1 = Cpu::new();
         cpu1.random_engine = SmallRng::seed_from_u64(42);
 
-        let values = (0..10).map(|_| cpu1.get_random()).collect::<Vec<_>>();
+        let values = (0..10).map(|_| cpu1.random()).collect::<Vec<_>>();
 
         let mut cpu2 = Cpu::new();
         cpu2.random_engine = SmallRng::seed_from_u64(42);
 
-        let values2 = (0..10).map(|_| cpu2.get_random()).collect::<Vec<_>>();
+        let values2 = (0..10).map(|_| cpu2.random()).collect::<Vec<_>>();
 
         assert_eq!(values, values2);
     }

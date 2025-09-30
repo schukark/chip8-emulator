@@ -59,7 +59,7 @@ impl Display {
     }
 
     /// Get current display state
-    pub fn get_state(&self) -> &[[bool; 64]; 32] {
+    pub fn state(&self) -> &[[bool; 64]; 32] {
         &self.pixels
     }
 }
@@ -76,7 +76,7 @@ mod tests {
         let sprite = [0b11110000, 0b10010000, 0b11110000, 0b10010000, 0b11110000];
 
         let collisions = display.draw_sprite(&sprite, 0, 0).unwrap();
-        let display_state = display.get_state();
+        let display_state = display.state();
         let result = ArrayView2::from(display_state);
 
         let expected = ndarray::array![
@@ -98,7 +98,7 @@ mod tests {
 
         let collisions = display.draw_sprite(&sprite, 0, 0).unwrap();
         display.clear();
-        let display_state = display.get_state();
+        let display_state = display.state();
 
         assert!(!collisions);
         assert_eq!(display_state, &[[false; 64]; 32]);
@@ -117,7 +117,7 @@ mod tests {
 
         let collisions1 = display.draw_sprite(&sprite1, 0, 0).unwrap();
         let collisions2 = display.draw_sprite(&sprite2, 2, 2).unwrap();
-        let display_state = display.get_state();
+        let display_state = display.state();
         let result = ArrayView2::from(display_state);
 
         let expected = ndarray::array![
@@ -140,7 +140,7 @@ mod tests {
         let mut display = Display::new();
         let sprite = [0b10000000];
         display.draw_sprite(&sprite, 63, 31).unwrap();
-        assert!(display.get_state()[31][63]);
+        assert!(display.state()[31][63]);
     }
 
     #[test]

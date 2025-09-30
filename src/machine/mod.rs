@@ -89,7 +89,7 @@ impl Chip8 {
 
     /// Run one fetch-decode-execute cycle
     pub fn step(&mut self) -> Result<(), Chip8Error> {
-        let pc = self.cpu.get_program_counter();
+        let pc = self.cpu.program_counter();
         let opcode = self.memory.read_word(pc)?;
         let instruction = Instruction::try_from(opcode)?;
 
@@ -123,7 +123,7 @@ impl Chip8 {
                 ExecResult::Jumped
             }
             Instruction::CallSubroutine { address } => {
-                self.cpu.stack_push(self.cpu.get_program_counter())?;
+                self.cpu.stack_push(self.cpu.program_counter())?;
                 self.cpu.set_program_counter(address.into_inner())?;
                 ExecResult::Jumped
             }
@@ -226,7 +226,7 @@ impl Chip8 {
                 ExecResult::Jumped
             }
             Instruction::Rand { x, value } => {
-                let rand = self.cpu.get_random();
+                let rand = self.cpu.random();
                 *self.cpu.vx(x) = rand & value;
                 ExecResult::Advance
             }
@@ -234,8 +234,7 @@ impl Chip8 {
                 let mut sprite = vec![0_u8; height.into_inner() as usize];
 
                 for i in 0..height.into_inner() {
-                    sprite[i as usize] =
-                        self.memory.read_byte(self.cpu.get_address() + i as u16)?;
+                    sprite[i as usize] = self.memory.read_byte(self.cpu.address() + i as u16)?;
                 }
 
                 let vx = *self.cpu.vx(x);
@@ -253,7 +252,7 @@ impl Chip8 {
                 unimplemented!("Keypad is not yet implemented")
             }
             Instruction::GetDelayTimer { x } => {
-                *self.cpu.vx(x) = self.cpu.get_delay_timer();
+                *self.cpu.vx(x) = self.cpu.delay_timer();
                 ExecResult::Advance
             }
             Instruction::AwaitKeyPress { x: _ } => unimplemented!("Keypad is not yet implemented"),
@@ -290,13 +289,13 @@ impl Chip8 {
                 let ones = vx % 10;
 
                 self.memory
-                    .load(self.cpu.get_address(), &[hundreds, tens, ones])?;
+                    .load(self.cpu.address(), &[hundreds, tens, ones])?;
                 ExecResult::Advance
             }
             Instruction::DumpRegisters { x } => {
                 for i in 0..=x.into_inner() {
                     self.memory.load(
-                        self.cpu.get_address() + i as u16,
+                        self.cpu.address() + i as u16,
                         &[*self.cpu.vx(Index::try_new(i).unwrap())],
                     )?;
                 }
@@ -305,7 +304,7 @@ impl Chip8 {
             Instruction::LoadRegisters { x } => {
                 for i in 0..=x.into_inner() {
                     *self.cpu.vx(Index::try_new(i).unwrap()) =
-                        self.memory.read_byte(self.cpu.get_address() + i as u16)?;
+                        self.memory.read_byte(self.cpu.address() + i as u16)?;
                 }
                 ExecResult::Advance
             }
