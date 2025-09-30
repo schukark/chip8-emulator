@@ -79,3 +79,53 @@ impl Keypad {
         self.last_pressed = None;
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use test_case::test_case;
+
+    #[test_case(0x0 ; "lowest key")]
+    #[test_case(0xF ; "highest key")]
+    #[test_case(0xA ; "random key")]
+    fn test_simple_press(key: u8) {
+        let mut keypad = Keypad::new();
+        keypad.press_key(key).unwrap();
+
+        assert!(keypad.is_pressed(key).unwrap());
+    }
+
+    #[test]
+    fn test_simple_press_release() {
+        let mut keypad = Keypad::new();
+        keypad.press_key(0xC).unwrap();
+        keypad.press_key(0xD).unwrap();
+        keypad.release_key(0xC).unwrap();
+
+        assert!(!keypad.is_pressed(0xC).unwrap());
+        assert!(keypad.is_pressed(0xD).unwrap());
+    }
+
+    #[test]
+    fn test_last_pressed() {
+        let mut keypad = Keypad::new();
+
+        keypad.press_key(0x7).unwrap();
+        assert_eq!(keypad.last_pressed().unwrap(), 0x7);
+
+        keypad.press_key(0xF).unwrap();
+        assert_eq!(keypad.last_pressed().unwrap(), 0xF);
+
+        keypad.clear_last();
+        assert!(keypad.last_pressed().is_none());
+    }
+
+    #[test]
+    fn test_invalid_key() {
+        let mut keypad = Keypad::new();
+        assert!(matches!(
+            keypad.press_key(0x10),
+            Err(KeypadError::NoSuchKey)
+        ));
+    }
+}
