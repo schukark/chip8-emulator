@@ -9,6 +9,8 @@ pub struct Memory {
     data: [u8; 4096],
 }
 
+use tklog::{error, trace};
+
 /// Predefined sprites for all hex digits
 const DIGIT_SPRITES: [[u8; 5]; 16] = [
     [0xF0, 0x90, 0x90, 0x90, 0xF0], // ZERO
@@ -63,8 +65,13 @@ impl Memory {
     /// Returns error if the sprite asked is not in 0..=F
     pub fn read_sprite_address(&self, digit: u8) -> Result<u16, MemoryError> {
         if digit > 0xF {
+            error!(
+                "Incorrect digit sprite asked, should be <= 0xF, was ",
+                digit
+            );
             Err(MemoryError::IncorrectSprite)
         } else {
+            trace!("Found digit ", digit, " sprite at ", digit as u16 * 5);
             Ok(digit as u16 * 5)
         }
     }
@@ -72,32 +79,51 @@ impl Memory {
     /// Fetch a byte from address
     pub fn read_byte(&self, addr: u16) -> Result<u8, MemoryError> {
         if addr >= 1 << 12 {
+            error!("Got incorrect address, should be below 4096, was ", addr);
             return Err(MemoryError::OutOfRange(addr));
         }
+        trace!(
+            "Read byte ",
+            self.data[addr as usize], " from address ", addr
+        );
         Ok(self.data[addr as usize])
     }
 
     /// Fetch a 2-byte word from address
     pub fn read_word(&self, addr: u16) -> Result<u16, MemoryError> {
         if addr >= (1 << 12) - 1 {
+            error!("Got incorrect address, should be below 4095, was ", addr);
             return Err(MemoryError::OutOfRange(addr));
         }
         let hi = self.data[addr as usize] as u16;
         let lo = self.data[(addr + 1) as usize] as u16;
+        trace!("Read word ", (hi << 8) | lo, " from address ", addr);
         Ok((hi << 8) | lo)
     }
 
     /// Load bytes into ram starting from given address
     pub fn load(&mut self, start: u16, bytes: &[u8]) -> Result<(), MemoryError> {
         if start < 0x200 {
+            error!(
+                "Requested reserved memory, addresses should be at leas 512, got ",
+                start
+            );
             return Err(MemoryError::PermissionDenied);
         }
 
         if start as usize + bytes.len() > self.data.len() {
+            error!(
+                "Invalid memory request, address should be below 4096, got ",
+                start + bytes.len() as u16
+            );
             return Err(MemoryError::OutOfRange(start + bytes.len() as u16));
         }
 
         self.data[start as usize..start as usize + bytes.len()].copy_from_slice(bytes);
+        trace!(format!(
+            "Wrote {bytes:#?} to memory from {start} to {}",
+            start + bytes.len() as u16
+        ));
         Ok(())
     }
 }

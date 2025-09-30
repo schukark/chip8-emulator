@@ -5,6 +5,8 @@ use crate::types::Index;
 use rand::{Rng, SeedableRng, rng, rngs::SmallRng};
 use thiserror::Error;
 
+use tklog::{debug, error};
+
 /// Store register and stack state\
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Cpu {
@@ -76,9 +78,14 @@ impl Cpu {
     /// Returns an error if the program counter doesn't fit into 12 bits
     pub fn advance_program_counter(&mut self, step: u16) -> Result<(), CpuError> {
         if self.program_counter + step >= 1 << 12 {
+            error!("Program counter out of range!");
             Err(CpuError::PCOutOfRange)
         } else {
             self.program_counter += step;
+            debug!(format!(
+                "Program counter was advanced by {} to {}",
+                step, self.program_counter
+            ));
             Ok(())
         }
     }
@@ -88,9 +95,11 @@ impl Cpu {
     /// Returns an error if the program counter doesn't fit into 12 bits
     pub fn set_program_counter(&mut self, new_pc: u16) -> Result<(), CpuError> {
         if new_pc >= 1 << 12 {
+            error!("Program counter out of range!");
             Err(CpuError::PCOutOfRange)
         } else {
             self.program_counter = new_pc;
+            debug!("Program counter was set to ", new_pc);
             Ok(())
         }
     }
@@ -105,21 +114,28 @@ impl Cpu {
     /// Returns an error if the address doesn't fit into 12 bits
     pub fn set_address(&mut self, value: u16) -> Result<(), CpuError> {
         if value >= 1 << 12 {
+            error!("Address is too big for 12 bits!");
             Err(CpuError::AddressOutOfRange)
         } else {
             self.address = value;
+            debug!("Address was set to ", value);
             Ok(())
         }
     }
 
-    /// Increment address register by given value
+    /// Increment address register by given step
     ///
     /// Returns an error if the address doesn't fit into 12 bits
-    pub fn advance_address(&mut self, value: u16) -> Result<(), CpuError> {
-        if value + self.address >= 1 << 12 {
+    pub fn advance_address(&mut self, step: u16) -> Result<(), CpuError> {
+        if step + self.address >= 1 << 12 {
+            error!("Address is too big for 12 bits!");
             Err(CpuError::AddressOutOfRange)
         } else {
-            self.address += value;
+            debug!(format!(
+                "Address register was advanced by {} to {}",
+                step, self.address
+            ));
+            self.address += step;
             Ok(())
         }
     }
@@ -129,11 +145,13 @@ impl Cpu {
     /// Returns an error if the stack limit is reached
     pub fn stack_push(&mut self, address: u16) -> Result<(), CpuError> {
         if self.stack_pointer == 16 {
+            error!("Stack limit of 16 was reached!");
             return Err(CpuError::StackLimitReached);
         }
 
         self.stack[self.stack_pointer] = address;
         self.stack_pointer += 1;
+        debug!("Put value ", address, " on top of the stack");
 
         Ok(())
     }
@@ -143,11 +161,13 @@ impl Cpu {
     /// Returns an error if was called on an empty stack
     pub fn stack_pop(&mut self) -> Result<u16, CpuError> {
         if self.stack_pointer == 0 {
+            error!("Pop was called on empty stack!");
             return Err(CpuError::StackEmpty);
         }
 
         let result = self.stack[self.stack_pointer - 1];
         self.stack_pointer -= 1;
+        debug!("Removed value ", result, " from the stack");
 
         Ok(result)
     }
@@ -164,11 +184,13 @@ impl Cpu {
 
     /// Set delay timer
     pub fn set_delay_timer(&mut self, value: u8) {
+        debug!("Delay timer was set to ", value);
         self.delay_timer = value;
     }
 
     /// Set sound timer
     pub fn set_sound_timer(&mut self, value: u8) {
+        debug!("Sound timer was set to ", value);
         self.sound_timer = value;
     }
 
@@ -181,9 +203,11 @@ impl Cpu {
     pub fn tick_timers(&mut self) {
         if self.delay_timer > 0 {
             self.delay_timer -= 1;
+            debug!("Delay timer ticked down to ", self.delay_timer);
         }
         if self.sound_timer > 0 {
             self.sound_timer -= 1;
+            debug!("Sound timer ticked down to ", self.sound_timer);
         }
     }
 }

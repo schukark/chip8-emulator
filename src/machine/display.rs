@@ -1,6 +1,7 @@
 //! Chip8 display implementation
 
 use thiserror::Error;
+use tklog::{debug, error, trace};
 
 /// 64x32 monochrome screen
 pub struct Display {
@@ -29,6 +30,7 @@ impl Display {
 
     /// Clear the screen
     pub fn clear(&mut self) {
+        debug!("The screen was cleared");
         self.pixels = [[false; 64]; 32];
     }
 
@@ -37,6 +39,10 @@ impl Display {
     /// Returns true if any pixels were turned off by drawing this sprite
     pub fn draw_sprite(&mut self, sprite: &[u8], vx: u8, vy: u8) -> Result<bool, DisplayError> {
         if sprite.len() > 32 {
+            error!(
+                "DRW was called on sprite of length > 32, namely ",
+                sprite.len()
+            );
             return Err(DisplayError::SpriteTooBig);
         }
 
@@ -51,7 +57,13 @@ impl Display {
                 let new_pixel = self.pixels[pos_y][pos_x] ^ (pixel == 1);
                 if self.pixels[pos_y][pos_x] && !new_pixel {
                     collision = true;
+                    trace!("Found collision on x ", pos_x, ", y ", pos_y);
                 }
+
+                if self.pixels[pos_y][pos_x] != new_pixel {
+                    trace!("Pixel at x ", pos_x, ", y ", pos_y, " changed it state");
+                }
+
                 self.pixels[pos_y][pos_x] = new_pixel;
             }
         }

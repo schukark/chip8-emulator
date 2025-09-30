@@ -1,6 +1,7 @@
 //! Chip8 keypad implementation
 
 use thiserror::Error;
+use tklog::{error, trace};
 
 /// Hex keypad (0-F)
 pub struct Keypad {
@@ -37,11 +38,13 @@ impl Keypad {
     /// Returns an error if the key pressed doesn't exist (not in 0x0..=0xF)
     pub fn press_key(&mut self, key: u8) -> Result<(), KeypadError> {
         if key > 0xF {
+            error!("Invalid key press request ", key);
             return Err(KeypadError::NoSuchKey);
         }
 
         self.keys[key as usize] = true;
         self.last_pressed = Some(key);
+        trace!("Pressed key ", key);
 
         Ok(())
     }
@@ -51,10 +54,12 @@ impl Keypad {
     /// Returns an error if the key pressed doesn't exist (not in 0x0..=0xF)
     pub fn release_key(&mut self, key: u8) -> Result<(), KeypadError> {
         if key > 0xF {
+            error!("Invalid key release request ", key);
             return Err(KeypadError::NoSuchKey);
         }
 
         self.keys[key as usize] = false;
+        trace!("Released key ", key);
 
         Ok(())
     }
@@ -62,6 +67,7 @@ impl Keypad {
     /// Query whether a key is pressed
     pub fn is_pressed(&self, key: u8) -> Result<bool, KeypadError> {
         if key > 0xF {
+            error!("Invalid is_pressed key request ", key);
             return Err(KeypadError::NoSuchKey);
         }
         Ok(self.keys[key as usize])
