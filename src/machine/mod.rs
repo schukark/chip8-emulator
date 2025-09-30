@@ -333,4 +333,14 @@ impl Chip8 {
 
         Ok(result)
     }
+
+    /// Get a snapshot of current display state to render
+    pub fn display_snapshot(&self) -> &[[bool; 64]; 32] {
+        self.display.state()
+    }
+
+    /// Tick timers by one if possible
+    pub fn tick_timers(&mut self) {
+        self.cpu.tick_timers()
+    }
 }
