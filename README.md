@@ -12,21 +12,22 @@ I decided to take on this project as a learning experience both in Rust and Low-
 cargo run --release /path/to/rom
 ```
 
-You can download any Chip8-compatible rom and run it using a command above.
+You can download any Chip8-compatible rom and run it using a command above. (IN DEVELOPMENT)
 
 I highly recommend to pay a visit (and drop a star) to this repo full of roms:
 ![click](https://github.com/loktar00/chip8/tree/master/roms)
 
 ## TBD
 
-- [ ] Write better unit tests
+- [x] Write better unit tests
   - [x] Test Instructions fully
   - [x] Test CPU
   - [x] Test Memory
   - [x] Test Display
   - [x] Test Keypad
 - [x] Implement Display in code
-- [ ] Implement Display visually
 - [x] Implement Keypad
+- [ ] Test the machine as a whole
+- [ ] Implement Display visually
 - [ ] Document and check for typos
 - [ ] Run Space Invaders/Pong
