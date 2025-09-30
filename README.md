@@ -28,6 +28,7 @@ I highly recommend to pay a visit (and drop a star) to this repo full of roms:
 - [x] Implement Display in code
 - [x] Implement Keypad
 - [ ] Test the machine as a whole
-- [ ] Implement Display visually
+- [x] Add logging
+- [x] Implement Display visually
 - [ ] Document and check for typos
 - [ ] Run Space Invaders/Pong
