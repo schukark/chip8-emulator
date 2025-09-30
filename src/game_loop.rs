@@ -1,14 +1,16 @@
 //! Module with all the wiring of components, including the main game loop
 
-use crate::machine::Chip8;
+use crate::{decoder::instruction::decode, machine::Chip8};
 use crossterm::{
     cursor,
-    event::{self, Event, KeyCode},
+    event::{self, Event, KeyCode, KeyEvent},
     execute, queue,
     terminal::{self, ClearType},
 };
 use std::io::{self, Write, stdout};
 use std::time::{Duration, Instant};
+
+use tklog::debug;
 
 /// Run the game loop
 pub fn run_game(chip8: &mut Chip8) -> io::Result<()> {
@@ -21,12 +23,15 @@ pub fn run_game(chip8: &mut Chip8) -> io::Result<()> {
 
     'game: loop {
         while event::poll(Duration::from_millis(1))? {
-            if let Event::Key(key) = event::read()? {
-                match key.code {
-                    KeyCode::Char('q') => break 'game,
-                    KeyCode::Char('1') => chip8.keypad.press_key(0x1).unwrap(),
-                    KeyCode::Char('!') => chip8.keypad.release_key(0x1).unwrap(),
-                    _ => {}
+            if let Event::Key(event_key) = event::read()? {
+                if let KeyCode::Enter = event_key.code {
+                    break 'game;
+                }
+
+                match keymap(event_key) {
+                    None => {}
+                    Some((key, true)) => chip8.keypad.press_key(key).unwrap(),
+                    Some((key, false)) => chip8.keypad.release_key(key).unwrap(),
                 }
             }
         }
@@ -69,8 +74,51 @@ pub fn run_game(chip8: &mut Chip8) -> io::Result<()> {
 /// Helper function to load the program and return a ready Chip8 instance
 pub fn load_program(program: &[u8]) -> Result<Chip8, String> {
     let mut chip8 = Chip8::new();
+
+    match decode(program) {
+        Ok(instructions) => {
+            debug!("Decoded instructions below");
+            for instr in instructions {
+                debug!(instr);
+            }
+        }
+        Err(e) => return Err(e.to_string()),
+    };
+
     match chip8.load_program(program) {
         Ok(_) => Ok(chip8),
         Err(e) => Err(e.to_string()),
+    }
+}
+
+/// Map the real input to Chip8 Hex keyboard inputs
+///
+/// Returns None if the event is not of relevance to the hex keyboard,
+/// Some((key, value)) if key was influenced,
+/// value shows if it was pressed (true) or released (false)
+pub fn keymap(event: KeyEvent) -> Option<(u8, bool)> {
+    let pressed = event.kind.is_press();
+    match event.code {
+        KeyCode::Char('1') => Some((0x1, pressed)),
+        KeyCode::Char('2') => Some((0x2, pressed)),
+        KeyCode::Char('3') => Some((0x3, pressed)),
+        KeyCode::Char('4') => Some((0xC, pressed)),
+
+        KeyCode::Char('q') => Some((0x4, pressed)),
+        KeyCode::Char('w') => Some((0x5, pressed)),
+        KeyCode::Char('e') => Some((0x6, pressed)),
+        KeyCode::Char('r') => Some((0xD, pressed)),
+
+        KeyCode::Char('a') => Some((0x7, pressed)),
+        KeyCode::Char('s') => Some((0x8, pressed)),
+        KeyCode::Char('d') => Some((0x9, pressed)),
+        KeyCode::Char('f') => Some((0xE, pressed)),
+
+        KeyCode::Char('z') => Some((0xA, pressed)),
+        KeyCode::Char('x') => Some((0x0, pressed)),
+        KeyCode::Char('c') => Some((0xB, pressed)),
+        KeyCode::Char('v') => Some((0xF, pressed)),
+
+        _ => None,
     }
 }
