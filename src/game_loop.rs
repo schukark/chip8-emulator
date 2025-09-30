@@ -20,7 +20,6 @@ pub fn run_game(chip8: &mut Chip8) -> io::Result<()> {
     let mut last_display_state = [[false; 64]; 32];
 
     'game: loop {
-        // --- Input ---
         while event::poll(Duration::from_millis(1))? {
             if let Event::Key(key) = event::read()? {
                 match key.code {
@@ -32,10 +31,8 @@ pub fn run_game(chip8: &mut Chip8) -> io::Result<()> {
             }
         }
 
-        // --- Emulate cycles ---
         chip8.step().unwrap();
 
-        // --- Timers (60Hz) ---
         if last_timer_tick.elapsed() >= Duration::from_millis(16) {
             chip8.tick_timers();
             last_timer_tick = Instant::now();
@@ -44,7 +41,6 @@ pub fn run_game(chip8: &mut Chip8) -> io::Result<()> {
         let current_display_state = chip8.display_snapshot();
 
         if *current_display_state != last_display_state {
-            // --- Render (maybe every frame or when display is dirty) ---
             queue!(
                 stdout,
                 terminal::Clear(ClearType::All),
