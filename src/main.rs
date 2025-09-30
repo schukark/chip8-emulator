@@ -16,7 +16,7 @@ fn log_init() {
     LOG.set_console(false) // Enables console logging
         .set_level(LEVEL::Trace) // Sets the log level; default is Debug
         .set_format(Format::LevelFlag | Format::Time | Format::ShortFileName) // Defines structured log output with chosen details
-        .set_cutmode_by_size("tklogsize.txt", 1 << 20, 10, true) // Cuts logs by file size (1 MB), keeps 10 backups, compresses backups
+        .set_cutmode_by_size("logs/tklogsize.txt", 1 << 20, 0, true) // Cuts logs by file size (1 MB), keeps 10 backups, compresses backups
         .set_formatter("{level}{time} {file}:{message}\n"); // Customizes log output format; default is "{level}{time} {file}:{message}"
 }
 

@@ -56,7 +56,7 @@ pub fn run_game(chip8: &mut Chip8) -> io::Result<()> {
                     let symbol = if px { "██" } else { "  " };
                     queue!(stdout, crossterm::style::Print(symbol))?;
                 }
-                queue!(stdout, crossterm::style::Print("\n"))?;
+                queue!(stdout, crossterm::style::Print("\r\n"))?;
             }
 
             last_display_state = *current_display_state;
