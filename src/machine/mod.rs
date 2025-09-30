@@ -253,7 +253,6 @@ impl Chip8 {
                 }
                 ExecResult::Advance
             }
-
             Instruction::KeyReleasedSkip { x } => {
                 let vx = *self.cpu.vx(x);
 
@@ -276,7 +275,6 @@ impl Chip8 {
                     ExecResult::Wait
                 }
             }
-
             Instruction::SetDelayTimer { x } => {
                 let vx = *self.cpu.vx(x);
                 self.cpu.set_delay_timer(vx);
