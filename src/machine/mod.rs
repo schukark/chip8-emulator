@@ -226,7 +226,7 @@ impl Chip8 {
                 ExecResult::Jumped
             }
             Instruction::Rand { x, value } => {
-                let rand = rand::random::<u8>();
+                let rand = self.cpu.get_random();
                 *self.cpu.vx(x) = rand & value;
                 ExecResult::Advance
             }

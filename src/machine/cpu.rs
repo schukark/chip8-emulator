@@ -2,10 +2,11 @@
 
 use crate::types::Index;
 
+use rand::{Rng, SeedableRng, rng, rngs::SmallRng};
 use thiserror::Error;
 
 /// Store register and stack state\
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Cpu {
     /// General purpose registers, V0 through VF, 8 bit each
     general: [u8; 16],
@@ -21,6 +22,8 @@ pub struct Cpu {
     stack_pointer: usize,
     /// Stack
     stack: [u16; 16],
+    /// Random engine for reproducible randomness
+    random_engine: SmallRng,
 }
 
 impl Default for Cpu {
@@ -59,6 +62,7 @@ impl Cpu {
             program_counter: 0x200, // programs start at 0x200
             stack_pointer: 0,
             stack: [0; 16],
+            random_engine: SmallRng::from_rng(&mut rng()),
         }
     }
 
@@ -166,6 +170,11 @@ impl Cpu {
     /// Set sound timer
     pub fn set_sound_timer(&mut self, value: u8) {
         self.sound_timer = value;
+    }
+
+    /// Get randomness
+    pub fn get_random(&mut self) -> u8 {
+        self.random_engine.random_range(0x0..=0xFF)
     }
 }
 
@@ -280,5 +289,20 @@ mod tests {
 
         cpu.set_sound_timer(0x20);
         assert_eq!(cpu.sound_timer, 0x20);
+    }
+
+    #[test]
+    fn test_reproducible_randomness() {
+        let mut cpu1 = Cpu::new();
+        cpu1.random_engine = SmallRng::seed_from_u64(42);
+
+        let values = (0..10).map(|_| cpu1.get_random()).collect::<Vec<_>>();
+
+        let mut cpu2 = Cpu::new();
+        cpu2.random_engine = SmallRng::seed_from_u64(42);
+
+        let values2 = (0..10).map(|_| cpu2.get_random()).collect::<Vec<_>>();
+
+        assert_eq!(values, values2);
     }
 }
