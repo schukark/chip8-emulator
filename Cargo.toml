@@ -14,3 +14,4 @@ thiserror = "2.0.16"
 [dev-dependencies]
 proptest = "1.8.0"
 test-case = "3.3.1"
+ndarray = "0.16.1"
