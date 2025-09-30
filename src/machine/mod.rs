@@ -19,6 +19,8 @@ mod cpu;
 mod display;
 mod keypad;
 mod memory;
+#[cfg(test)]
+mod tests;
 
 /// Enum of program counter statuses after command execution
 enum ExecResult {
