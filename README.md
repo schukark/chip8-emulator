@@ -23,7 +23,7 @@ I highly recommend to pay a visit (and drop a star) to this repo full of roms:
   - [x] Test Instructions fully
   - [x] Test CPU
   - [x] Test Memory
-  - [ ] Test Display
+  - [x] Test Display
   - [ ] Test Keypad
 - [x] Implement Display in code
 - [ ] Implement Display visually
