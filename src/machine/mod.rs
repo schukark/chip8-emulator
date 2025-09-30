@@ -245,17 +245,38 @@ impl Chip8 {
 
                 ExecResult::Advance
             }
-            Instruction::KeyPressedSkip { x: _ } => {
-                unimplemented!("Keypad is not yet implemented")
+            Instruction::KeyPressedSkip { x } => {
+                let vx = *self.cpu.vx(x);
+                let pressed = self.keypad.is_pressed(vx)?;
+                if pressed {
+                    self.cpu.advance_program_counter(2)?;
+                }
+                ExecResult::Advance
             }
-            Instruction::KeyReleasedSkip { x: _ } => {
-                unimplemented!("Keypad is not yet implemented")
+
+            Instruction::KeyReleasedSkip { x } => {
+                let vx = *self.cpu.vx(x);
+
+                if !self.keypad.is_pressed(vx)? {
+                    self.cpu.advance_program_counter(2)?;
+                }
+
+                ExecResult::Advance
             }
             Instruction::GetDelayTimer { x } => {
                 *self.cpu.vx(x) = self.cpu.delay_timer();
                 ExecResult::Advance
             }
-            Instruction::AwaitKeyPress { x: _ } => unimplemented!("Keypad is not yet implemented"),
+            Instruction::AwaitKeyPress { x } => {
+                if let Some(k) = self.keypad.last_pressed() {
+                    *self.cpu.vx(x) = k;
+                    self.keypad.clear_last();
+                    ExecResult::Advance
+                } else {
+                    ExecResult::Wait
+                }
+            }
+
             Instruction::SetDelayTimer { x } => {
                 let vx = *self.cpu.vx(x);
                 self.cpu.set_delay_timer(vx);
