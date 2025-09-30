@@ -240,7 +240,7 @@ impl Chip8 {
 
                 let vx = *self.cpu.vx(x);
                 let vy = *self.cpu.vx(y);
-                let collision = self.display.draw_sprite(&sprite, vx, vy);
+                let collision = self.display.draw_sprite(&sprite, vx, vy)?;
 
                 *self.cpu.vx(Chip8::VF) = collision as u8;
 
