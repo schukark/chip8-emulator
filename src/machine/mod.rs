@@ -133,7 +133,7 @@ impl Chip8 {
                 ExecResult::Jumped
             }
             Instruction::CallSubroutine { address } => {
-                self.cpu.stack_push(self.cpu.program_counter())?;
+                self.cpu.stack_push(self.cpu.program_counter() + 2)?;
                 self.cpu.set_program_counter(address.into_inner())?;
                 ExecResult::Jumped
             }
@@ -281,9 +281,8 @@ impl Chip8 {
                 ExecResult::Advance
             }
             Instruction::AwaitKeyPress { x } => {
-                if let Some(k) = self.keypad.last_pressed() {
+                if let Some(k) = self.keypad.any_pressed() {
                     *self.cpu.vx(x) = k;
-                    self.keypad.clear_last();
                     ExecResult::Advance
                 } else {
                     ExecResult::Wait
