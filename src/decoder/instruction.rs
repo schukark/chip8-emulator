@@ -227,9 +227,6 @@ pub enum DecodeError {
     #[error("Command {0:#04X} is incorrect")]
     /// The command's bytes don't correspond to any correct instruction
     NoSuchInstruction(u16),
-    #[error("Bytestream can't be of odd length")]
-    /// Bytestream should consist of words of size 2 to be correctly decoded
-    OddLengthStream,
 }
 
 impl Display for Instruction {
@@ -332,24 +329,4 @@ impl TryFrom<u16> for Instruction {
 
         Ok(instruction)
     }
-}
-
-/// Try to decode a bytestream into a list of instructions
-///
-/// Byte stream's length must be even, because instructions
-/// are 2 byte in length
-pub fn decode(bytes: &[u8]) -> Result<Vec<Instruction>, DecodeError> {
-    if !bytes.len().is_multiple_of(2) {
-        return Err(DecodeError::OddLengthStream);
-    }
-
-    bytes
-        .chunks(2)
-        .map(|chunk| {
-            let hi = chunk[0] as u16;
-            let lo = chunk[1] as u16;
-            let value = (hi << 8) | lo;
-            Instruction::try_from(value)
-        })
-        .collect()
 }
