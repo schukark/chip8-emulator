@@ -77,21 +77,9 @@ impl Keypad {
         Ok(self.keys[key as usize])
     }
 
-    /// Get the last pressed key
-    ///
-    /// Even if the key is later released, is still returned
-    pub fn last_pressed(&self) -> Option<u8> {
-        trace!(format!(
-            "Checking what key was pressed last, result {:?}",
-            self.last_pressed
-        ));
-        self.last_pressed
-    }
-
-    /// Clear last pressed key
-    pub fn clear_last(&mut self) {
-        trace!("Cleared the last pressed key info");
-        self.last_pressed = None;
+    /// Query if any key is pressed right now, and if so, which one (picks left most)
+    pub fn any_pressed(&self) -> Option<u8> {
+        self.keys.iter().position(|x| *x).map(|x| x as u8)
     }
 }
 
@@ -119,20 +107,6 @@ mod tests {
 
         assert!(!keypad.is_pressed(0xC).unwrap());
         assert!(keypad.is_pressed(0xD).unwrap());
-    }
-
-    #[test]
-    fn test_last_pressed() {
-        let mut keypad = Keypad::new();
-
-        keypad.press_key(0x7).unwrap();
-        assert_eq!(keypad.last_pressed().unwrap(), 0x7);
-
-        keypad.press_key(0xF).unwrap();
-        assert_eq!(keypad.last_pressed().unwrap(), 0xF);
-
-        keypad.clear_last();
-        assert!(keypad.last_pressed().is_none());
     }
 
     #[test]
