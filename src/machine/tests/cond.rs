@@ -10,8 +10,7 @@ fn test_eq_const_skips_when_equal() {
 
     let instr = Instruction::EqConst { x: V0, value: 42 };
 
-    chip8.execute(instr).unwrap();
-    assert_eq!(chip8.cpu.program_counter(), 0x202);
+    assert!(matches!(chip8.execute(instr).unwrap(), ExecResult::Skip));
 }
 
 #[test]
@@ -21,8 +20,7 @@ fn test_eq_const_stays_when_not_equal() {
 
     let instr = Instruction::EqConst { x: V0, value: 42 };
 
-    chip8.execute(instr).unwrap();
-    assert_eq!(chip8.cpu.program_counter(), 0x200);
+    assert!(matches!(chip8.execute(instr).unwrap(), ExecResult::Advance));
 }
 
 #[test]
@@ -32,8 +30,7 @@ fn test_neq_const_stays_when_equal() {
 
     let instr = Instruction::NeqConst { x: V0, value: 42 };
 
-    chip8.execute(instr).unwrap();
-    assert_eq!(chip8.cpu.program_counter(), 0x200);
+    assert!(matches!(chip8.execute(instr).unwrap(), ExecResult::Advance));
 }
 
 #[test]
@@ -43,8 +40,7 @@ fn test_neq_const_skips_when_not_equal() {
 
     let instr = Instruction::NeqConst { x: V0, value: 42 };
 
-    chip8.execute(instr).unwrap();
-    assert_eq!(chip8.cpu.program_counter(), 0x202);
+    assert!(matches!(chip8.execute(instr).unwrap(), ExecResult::Skip));
 }
 
 #[test]
@@ -55,8 +51,7 @@ fn test_eq_reg_skips_when_equal() {
 
     let instr = Instruction::EqReg { x: V0, y: V4 };
 
-    chip8.execute(instr).unwrap();
-    assert_eq!(chip8.cpu.program_counter(), 0x202);
+    assert!(matches!(chip8.execute(instr).unwrap(), ExecResult::Skip));
 }
 
 #[test]
@@ -68,7 +63,7 @@ fn test_eq_reg_stays_when_not_equal() {
     let instr = Instruction::EqReg { x: V0, y: V4 };
 
     chip8.execute(instr).unwrap();
-    assert_eq!(chip8.cpu.program_counter(), 0x200);
+    assert!(matches!(chip8.execute(instr).unwrap(), ExecResult::Advance));
 }
 
 #[test]
@@ -80,7 +75,7 @@ fn test_neq_reg_stays_when_equal() {
     let instr = Instruction::NeqReg { x: V0, y: V4 };
 
     chip8.execute(instr).unwrap();
-    assert_eq!(chip8.cpu.program_counter(), 0x200);
+    assert!(matches!(chip8.execute(instr).unwrap(), ExecResult::Advance));
 }
 
 #[test]
@@ -91,6 +86,5 @@ fn test_neq_reg_skips_when_not_equal() {
 
     let instr = Instruction::NeqReg { x: V0, y: V4 };
 
-    chip8.execute(instr).unwrap();
-    assert_eq!(chip8.cpu.program_counter(), 0x202);
+    assert!(matches!(chip8.execute(instr).unwrap(), ExecResult::Skip));
 }
