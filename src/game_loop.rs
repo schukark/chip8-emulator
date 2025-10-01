@@ -50,11 +50,14 @@ pub fn run_game(chip8: &mut Chip8) -> io::Result<()> {
                 cursor::MoveTo(0, 0)
             )?;
 
+            queue!(stdout, crossterm::style::Print("\r\n"))?;
             for row in current_display_state {
+                queue!(stdout, crossterm::style::Print(" "))?;
                 for &px in row {
                     let symbol = if px { "██" } else { "  " };
                     queue!(stdout, crossterm::style::Print(symbol))?;
                 }
+                queue!(stdout, crossterm::style::Print(" "))?;
                 queue!(stdout, crossterm::style::Print("\r\n"))?;
             }
 
