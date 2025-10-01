@@ -1,6 +1,6 @@
 //! Module with all the wiring of components, including the main game loop
 
-use crate::{decoder::instruction::decode, machine::Chip8};
+use crate::machine::Chip8;
 use crossterm::{
     cursor,
     event::{self, Event, KeyCode, KeyEvent},
@@ -9,8 +9,6 @@ use crossterm::{
 };
 use std::io::{self, Write, stdout};
 use std::time::{Duration, Instant};
-
-use tklog::debug;
 
 /// Run the game loop
 pub fn run_game(chip8: &mut Chip8) -> io::Result<()> {
@@ -74,16 +72,6 @@ pub fn run_game(chip8: &mut Chip8) -> io::Result<()> {
 /// Helper function to load the program and return a ready Chip8 instance
 pub fn load_program(program: &[u8]) -> Result<Chip8, String> {
     let mut chip8 = Chip8::new();
-
-    match decode(program) {
-        Ok(instructions) => {
-            debug!("Decoded instructions below");
-            for instr in instructions {
-                debug!(instr);
-            }
-        }
-        Err(e) => return Err(e.to_string()),
-    };
 
     match chip8.load_program(program) {
         Ok(_) => Ok(chip8),
