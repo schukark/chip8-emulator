@@ -3,6 +3,7 @@
 //! Contains all components of chip8: registers, stack, display, timers and sounds
 
 use thiserror::Error;
+use tklog::debug;
 
 use crate::{
     decoder::instruction::{DecodeError, Instruction},
@@ -23,6 +24,7 @@ mod memory;
 mod tests;
 
 /// Enum of program counter statuses after command execution
+#[derive(Debug)]
 enum ExecResult {
     /// PC should advance to next word
     Advance,
@@ -30,6 +32,8 @@ enum ExecResult {
     Jumped,
     /// Waiting on something, no need to move PC
     Wait,
+    /// Skip the next instruction, moves PC by 4
+    Skip,
 }
 
 /// Full Chip-8 machine
@@ -93,14 +97,18 @@ impl Chip8 {
     pub fn step(&mut self) -> Result<(), Chip8Error> {
         let pc = self.cpu.program_counter();
         let opcode = self.memory.read_word(pc)?;
+        debug!(format!("PC={:#03x}, opcode={:#04x}", pc, opcode));
         let instruction = Instruction::try_from(opcode)?;
 
-        match self.execute(instruction) {
-            Ok(ExecResult::Advance) => self.cpu.advance_program_counter(2)?,
-            Ok(ExecResult::Jumped) => {}
-            Ok(ExecResult::Wait) => {}
-            Err(err) => return Err(err),
+        let exec_result = self.execute(instruction)?;
+        match exec_result {
+            ExecResult::Advance => self.cpu.advance_program_counter(2)?,
+            ExecResult::Jumped => {}
+            ExecResult::Wait => {}
+            ExecResult::Skip => self.cpu.advance_program_counter(4)?,
         };
+
+        debug!(format!("ExecResult = {:?}", exec_result));
 
         Ok(())
     }
@@ -131,24 +139,26 @@ impl Chip8 {
             }
             Instruction::EqConst { x, value } => {
                 if *self.cpu.vx(x) == value {
-                    self.cpu.advance_program_counter(2)?;
+                    ExecResult::Skip
+                } else {
+                    ExecResult::Advance
                 }
-
-                ExecResult::Advance
             }
             Instruction::NeqConst { x, value } => {
                 if *self.cpu.vx(x) != value {
-                    self.cpu.advance_program_counter(2)?;
+                    ExecResult::Skip
+                } else {
+                    ExecResult::Advance
                 }
-                ExecResult::Advance
             }
             Instruction::EqReg { x, y } => {
                 let vx = *self.cpu.vx(x);
                 let vy = *self.cpu.vx(y);
                 if vx == vy {
-                    self.cpu.advance_program_counter(2)?;
+                    ExecResult::Skip
+                } else {
+                    ExecResult::Advance
                 }
-                ExecResult::Advance
             }
             Instruction::AssignConst { x, value } => {
                 *self.cpu.vx(x) = value;
@@ -213,9 +223,10 @@ impl Chip8 {
                 let vx = *self.cpu.vx(x);
                 let vy = *self.cpu.vx(y);
                 if vx != vy {
-                    self.cpu.advance_program_counter(2)?;
+                    ExecResult::Skip
+                } else {
+                    ExecResult::Advance
                 }
-                ExecResult::Advance
             }
             Instruction::SetI { address } => {
                 self.cpu.set_address(address.into_inner())?;
@@ -251,18 +262,19 @@ impl Chip8 {
                 let vx = *self.cpu.vx(x);
                 let pressed = self.keypad.is_pressed(vx)?;
                 if pressed {
-                    self.cpu.advance_program_counter(2)?;
+                    ExecResult::Skip
+                } else {
+                    ExecResult::Advance
                 }
-                ExecResult::Advance
             }
             Instruction::KeyReleasedSkip { x } => {
                 let vx = *self.cpu.vx(x);
 
                 if !self.keypad.is_pressed(vx)? {
-                    self.cpu.advance_program_counter(2)?;
+                    ExecResult::Skip
+                } else {
+                    ExecResult::Advance
                 }
-
-                ExecResult::Advance
             }
             Instruction::GetDelayTimer { x } => {
                 *self.cpu.vx(x) = self.cpu.delay_timer();
