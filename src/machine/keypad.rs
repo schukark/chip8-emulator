@@ -5,14 +5,10 @@ use tklog::{error, trace};
 
 /// Hex keypad (0-F)
 pub struct Keypad {
-    /// Keypad keys
+    /// Keypad state
     /// on - pressed
     /// off - released
-    keys: [bool; 16],
-    /// Holds the last pressed key
-    ///
-    /// Optional because it can be reset
-    last_pressed: Option<u8>,
+    state: [bool; 16],
 }
 
 /// Enum for all possible keypad errors
@@ -27,44 +23,27 @@ pub enum KeypadError {
 impl Keypad {
     /// Create a new keypad
     pub fn new() -> Self {
-        Self {
-            keys: [false; 16],
-            last_pressed: None,
-        }
+        Self { state: [false; 16] }
     }
 
-    /// Press key
+    /// Sets the new key state (pressed = true/released = false)
     ///
     /// Returns an error if the key pressed doesn't exist (not in 0x0..=0xF)
-    pub fn press_key(&mut self, key: u8) -> Result<(), KeypadError> {
+    pub fn set_key_state(&mut self, key: u8, state: bool) -> Result<(), KeypadError> {
         if key > 0xF {
             error!("Invalid key press request ", key);
             return Err(KeypadError::NoSuchKey);
         }
 
-        self.keys[key as usize] = true;
-        self.last_pressed = Some(key);
-        trace!("Pressed key ", key);
-
-        Ok(())
-    }
-
-    /// Release key
-    ///
-    /// Returns an error if the key pressed doesn't exist (not in 0x0..=0xF)
-    pub fn release_key(&mut self, key: u8) -> Result<(), KeypadError> {
-        if key > 0xF {
-            error!("Invalid key release request ", key);
-            return Err(KeypadError::NoSuchKey);
-        }
-
-        self.keys[key as usize] = false;
-        trace!("Released key ", key);
+        self.state[key as usize] = state;
+        trace!("Set key ", key, " to state ", state);
 
         Ok(())
     }
 
     /// Query whether a key is pressed
+    ///
+    /// Returns the error if the key queried doesn't exist (not in 0x0..=0xF)
     pub fn is_pressed(&self, key: u8) -> Result<bool, KeypadError> {
         if key > 0xF {
             error!("Invalid is_pressed key request ", key);
@@ -72,14 +51,15 @@ impl Keypad {
         }
         trace!(
             "Checking if key ",
-            key, " is pressed, result ", self.keys[key as usize]
+            key, " is pressed, result ", self.state[key as usize]
         );
-        Ok(self.keys[key as usize])
+        Ok(self.state[key as usize])
     }
 
-    /// Query if any key is pressed right now, and if so, which one (picks left most)
+    /// Returns the first key that is pressed right now
     pub fn any_pressed(&self) -> Option<u8> {
-        self.keys.iter().position(|x| *x).map(|x| x as u8)
+        trace!(format!("Current state: {:?}", self.state));
+        self.state.iter().position(|&b| b).map(|i| i as u8)
     }
 }
 
@@ -93,7 +73,7 @@ mod tests {
     #[test_case(0xA ; "random key")]
     fn test_simple_press(key: u8) {
         let mut keypad = Keypad::new();
-        keypad.press_key(key).unwrap();
+        keypad.set_key_state(key, true).unwrap();
 
         assert!(keypad.is_pressed(key).unwrap());
     }
@@ -101,9 +81,9 @@ mod tests {
     #[test]
     fn test_simple_press_release() {
         let mut keypad = Keypad::new();
-        keypad.press_key(0xC).unwrap();
-        keypad.press_key(0xD).unwrap();
-        keypad.release_key(0xC).unwrap();
+        keypad.set_key_state(0xC, true).unwrap();
+        keypad.set_key_state(0xD, true).unwrap();
+        keypad.set_key_state(0xC, false).unwrap();
 
         assert!(!keypad.is_pressed(0xC).unwrap());
         assert!(keypad.is_pressed(0xD).unwrap());
@@ -113,7 +93,7 @@ mod tests {
     fn test_invalid_key() {
         let mut keypad = Keypad::new();
         assert!(matches!(
-            keypad.press_key(0x10),
+            keypad.set_key_state(0x10, true),
             Err(KeypadError::NoSuchKey)
         ));
     }

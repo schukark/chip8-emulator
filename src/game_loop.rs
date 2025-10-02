@@ -3,7 +3,7 @@
 use crate::machine::Chip8;
 use crossterm::{
     cursor,
-    event::{self, Event, KeyCode, KeyEvent},
+    event::{self, Event, KeyCode, KeyEvent, KeyEventKind},
     execute, queue,
     terminal::{self, ClearType},
 };
@@ -18,18 +18,21 @@ pub fn run_game(chip8: &mut Chip8) -> io::Result<()> {
 
     let mut last_timer_tick = Instant::now();
     let mut last_display_state = [[false; 64]; 32];
-
     'game: loop {
+        // Read input
+
+        for k in 0..16 {
+            chip8.keypad.set_key_state(k as u8, false).unwrap();
+        }
+
         while event::poll(Duration::from_millis(1))? {
             if let Event::Key(event_key) = event::read()? {
                 if let KeyCode::Enter = event_key.code {
                     break 'game;
                 }
 
-                match keymap(event_key) {
-                    None => {}
-                    Some((key, true)) => chip8.keypad.press_key(key).unwrap(),
-                    Some((key, false)) => chip8.keypad.release_key(key).unwrap(),
+                if let Some((key, true)) = keymap(event_key) {
+                    chip8.keypad.set_key_state(key, true).unwrap();
                 }
             }
         }
@@ -88,7 +91,12 @@ pub fn load_program(program: &[u8]) -> Result<Chip8, String> {
 /// Some((key, value)) if key was influenced,
 /// value shows if it was pressed (true) or released (false)
 pub fn keymap(event: KeyEvent) -> Option<(u8, bool)> {
-    let pressed = event.kind.is_press();
+    let pressed = match event.kind {
+        KeyEventKind::Press => true,
+        KeyEventKind::Release => false,
+        KeyEventKind::Repeat => return None, // ignore repeats
+    };
+
     match event.code {
         KeyCode::Char('1') => Some((0x1, pressed)),
         KeyCode::Char('2') => Some((0x2, pressed)),
