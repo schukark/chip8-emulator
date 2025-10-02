@@ -71,6 +71,12 @@ pub enum Chip8Error {
     UnsupportedInstruction,
 }
 
+impl Default for Chip8 {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Chip8 {
     /// VF register is used a lot here, so it is a predefined constant
     const VF: Index = unsafe { Index::new_unchecked(0xF) };
