@@ -5,7 +5,7 @@
 #![feature(custom_test_frameworks)]
 
 mod decoder;
-mod game_loop;
+mod window;
 mod machine;
 mod types;
 
@@ -31,18 +31,4 @@ fn main() {
 
     let program_path = std::env::args().nth(1).unwrap();
     let program = std::fs::read(program_path).expect("Error occured when opening rom");
-
-    let mut chip8 = match game_loop::load_program(&program) {
-        Ok(x) => x,
-        Err(e) => {
-            eprintln!("An error occured when loading the program, error: {e}");
-            return;
-        }
-    };
-    match game_loop::run_game(&mut chip8) {
-        Ok(_) => {}
-        Err(e) => {
-            eprintln!("Error occured during the game {e}");
-        }
-    }
 }
