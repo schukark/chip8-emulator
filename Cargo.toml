@@ -5,12 +5,14 @@ edition = "2024"
 
 [dependencies]
 anyhow = "1.0.100"
-crossterm = "0.29.0"
+device_query = "4.0.1"
 itertools = "0.14.0"
 nutype = { version = "0.6.2", features = ["new_unchecked"] }
+pixels = "0.15.0"
 rand = "0.9.2"
 thiserror = "2.0.16"
 tklog = "0.3.0"
+winit = "0.30.12"
 
 [dev-dependencies]
 proptest = "1.8.0"
