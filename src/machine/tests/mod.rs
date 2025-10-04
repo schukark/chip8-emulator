@@ -5,6 +5,7 @@ use crate::{machine::*, types::Address};
 mod bitop;
 mod cond;
 mod flow;
+mod math;
 mod mem;
 
 const V0: Index = unsafe { Index::new_unchecked(0) };
