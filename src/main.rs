@@ -4,15 +4,16 @@
 #![warn(clippy::missing_docs_in_private_items)]
 #![feature(custom_test_frameworks)]
 
-mod decoder;
-mod machine;
-mod types;
-mod window;
+pub mod decoder;
+pub mod machine;
+pub mod types;
+pub mod window;
 
 use tklog::{Format, LEVEL, LOG};
 
 use crate::window::run_app;
 
+#[allow(clippy::borrow_interior_mutable_const)] // As per docs of tklog, this is correct
 /// Setup logging
 fn log_init() {
     LOG.set_console(false) // Enables console logging

@@ -16,16 +16,16 @@ use crate::{
     types::Index,
 };
 
-mod cpu;
-mod display;
-mod keypad;
-mod memory;
+pub mod cpu;
+pub mod display;
+pub mod keypad;
+pub mod memory;
 #[cfg(test)]
 mod tests;
 
 /// Enum of program counter statuses after command execution
 #[derive(Debug)]
-enum ExecResult {
+pub enum ExecResult {
     /// PC should advance to next word
     Advance,
     /// Last instruction jumped, no need to move PC
@@ -39,13 +39,13 @@ enum ExecResult {
 /// Full Chip-8 machine
 pub struct Chip8 {
     /// Chip8 cpu
-    pub cpu: Cpu,
+    cpu: Cpu,
     /// Chip8 memory
-    pub memory: Memory,
+    memory: Memory,
     /// Chip8 display
-    pub display: Display,
+    display: Display,
     /// Chip8 keypad
-    pub keypad: Keypad,
+    keypad: Keypad,
 }
 
 /// Enum of all possible errors with chip8 instance
@@ -359,5 +359,10 @@ impl Chip8 {
     /// Tick timers by one if possible
     pub fn tick_timers(&mut self) {
         self.cpu.tick_timers()
+    }
+
+    /// Forward the keypresses to the keypad
+    pub fn set_key_state(&mut self, key: u8, state: bool) -> Result<(), Chip8Error> {
+        self.keypad.set_key_state(key, state).map_err(|x| x.into())
     }
 }

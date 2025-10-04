@@ -3,8 +3,10 @@ use std::fmt::Display;
 
 use thiserror::Error;
 
-use crate::types::{Address, Index, SpriteHeight};
-use crate::{op_addr, op_reg1, op_reg2, op_reg3, op_regconst};
+use crate::{
+    decoder::macros::*,
+    types::{Address, Index, SpriteHeight},
+};
 
 /// All the opcodes for chip8 emulator
 ///

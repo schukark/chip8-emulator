@@ -151,7 +151,7 @@ impl<'a> ApplicationHandler for App<'a> {
                 trace!(format!("Detected event: {event:#?}"));
 
                 if let Some((key, is_pressed)) = keymap(event) {
-                    self.chip8.keypad.set_key_state(key, is_pressed).unwrap();
+                    self.chip8.set_key_state(key, is_pressed).unwrap();
                 }
             }
             _ => (),
