@@ -20,7 +20,7 @@ fn test_call_function_correct() {
 
     assert!(matches!(chip8.execute(instr), Ok(ExecResult::Jumped)));
     assert_eq!(chip8.cpu.program_counter(), 0x47A);
-    assert_eq!(chip8.cpu.stack_pop().unwrap(), 0x200);
+    assert_eq!(chip8.cpu.stack_pop().unwrap(), 0x202);
 }
 
 #[test]
@@ -36,7 +36,7 @@ fn test_call_and_return_from_function() {
     let instr = Instruction::Return;
 
     assert!(matches!(chip8.execute(instr), Ok(ExecResult::Jumped)));
-    assert_eq!(chip8.cpu.program_counter(), 0x200);
+    assert_eq!(chip8.cpu.program_counter(), 0x202);
 }
 
 #[test]
