@@ -76,6 +76,12 @@ impl Display {
     }
 }
 
+impl Default for Display {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use ndarray::{ArrayView2, s};
