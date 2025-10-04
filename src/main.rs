@@ -5,11 +5,13 @@
 #![feature(custom_test_frameworks)]
 
 mod decoder;
-mod window;
 mod machine;
 mod types;
+mod window;
 
 use tklog::{Format, LEVEL, LOG};
+
+use crate::window::run_app;
 
 /// Setup logging
 fn log_init() {
@@ -29,6 +31,5 @@ fn main() {
         return;
     }
 
-    let program_path = std::env::args().nth(1).unwrap();
-    let program = std::fs::read(program_path).expect("Error occured when opening rom");
+    run_app(args).expect("Error occured when running the application");
 }
