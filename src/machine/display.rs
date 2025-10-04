@@ -83,6 +83,7 @@ impl Default for Display {
 }
 
 #[cfg(test)]
+#[cfg_attr(coverage_nightly, coverage(off))]
 mod tests {
     use ndarray::{ArrayView2, s};
 

@@ -2,3 +2,4 @@
 roms/
 proptest-regressions
 logs/
+lcov.info

@@ -19,3 +19,11 @@ proptest = "1.8.0"
 test-case = "3.3.1"
 ndarray = "0.16.1"
 test-context = "0.4.1"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = [
+  'cfg(coverage,coverage_nightly)',
+] }
+
+[features]
+no_coverage = []

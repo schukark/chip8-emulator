@@ -135,6 +135,7 @@ impl Default for Memory {
 }
 
 #[cfg(test)]
+#[cfg_attr(coverage_nightly, coverage(off))]
 mod tests {
     use super::*;
     use test_case::test_case;

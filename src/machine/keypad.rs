@@ -70,6 +70,7 @@ impl Default for Keypad {
 }
 
 #[cfg(test)]
+#[cfg_attr(coverage_nightly, coverage(off))]
 mod tests {
     use super::*;
     use test_case::test_case;

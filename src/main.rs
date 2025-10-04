@@ -3,6 +3,7 @@
 #![warn(missing_docs)]
 #![warn(clippy::missing_docs_in_private_items)]
 #![feature(custom_test_frameworks)]
+#![cfg_attr(coverage_nightly, feature(coverage_attribute))]
 
 pub mod decoder;
 pub mod machine;

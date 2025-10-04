@@ -3,4 +3,5 @@
 pub mod instruction;
 mod macros;
 #[cfg(test)]
+#[cfg_attr(coverage_nightly, coverage(off))]
 mod tests;

@@ -21,6 +21,7 @@ pub mod display;
 pub mod keypad;
 pub mod memory;
 #[cfg(test)]
+#[cfg_attr(coverage_nightly, coverage(off))]
 mod tests;
 
 /// Enum of program counter statuses after command execution
