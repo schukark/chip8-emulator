@@ -63,6 +63,7 @@ impl Keypad {
     }
 }
 
+#[cfg_attr(coverage_nightly, coverage(off))]
 impl Default for Keypad {
     fn default() -> Self {
         Self::new()

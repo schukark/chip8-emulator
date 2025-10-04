@@ -128,6 +128,7 @@ impl Memory {
     }
 }
 
+#[cfg_attr(coverage_nightly, coverage(off))]
 impl Default for Memory {
     fn default() -> Self {
         Self::new()

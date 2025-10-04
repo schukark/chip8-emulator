@@ -17,6 +17,7 @@ impl From<[u8; 3]> for Address {
     }
 }
 
+#[cfg_attr(coverage_nightly, coverage(off))]
 impl fmt::UpperHex for Address {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         fmt::UpperHex::fmt(&self.into_inner(), f)
@@ -35,6 +36,7 @@ impl fmt::UpperHex for Address {
 )]
 pub struct Index(u8);
 
+#[cfg_attr(coverage_nightly, coverage(off))]
 impl fmt::UpperHex for Index {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         fmt::UpperHex::fmt(&self.into_inner(), f)

@@ -28,6 +28,7 @@ pub struct Cpu {
     pub(crate) random_engine: SmallRng,
 }
 
+#[cfg_attr(coverage_nightly, coverage(off))]
 impl Default for Cpu {
     fn default() -> Self {
         Cpu::new()

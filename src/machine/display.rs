@@ -76,6 +76,7 @@ impl Display {
     }
 }
 
+#[cfg_attr(coverage_nightly, coverage(off))]
 impl Default for Display {
     fn default() -> Self {
         Self::new()
