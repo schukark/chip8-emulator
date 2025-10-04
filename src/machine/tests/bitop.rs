@@ -7,6 +7,9 @@ struct Context {
     index_y: Index,
 }
 
+const VX: u8 = 0x4F;
+const VY: u8 = 0xC4;
+
 impl TestContext for Context {
     fn setup() -> Self {
         let index_x = Index::try_new(0x4).unwrap();
@@ -17,8 +20,8 @@ impl TestContext for Context {
             index_y,
         };
 
-        *ctx.chip8.cpu.vx(index_x) = 0x4F;
-        *ctx.chip8.cpu.vx(index_y) = 0xC4;
+        *ctx.chip8.cpu.vx(index_x) = VX;
+        *ctx.chip8.cpu.vx(index_y) = VY;
 
         ctx
     }
@@ -33,7 +36,7 @@ fn test_or_reg(ctx: &mut Context) {
     };
 
     assert!(matches!(ctx.chip8.execute(instr), Ok(ExecResult::Advance)));
-    assert_eq!(*ctx.chip8.cpu.vx(ctx.index_x), 0xC4 | 0x4F);
+    assert_eq!(*ctx.chip8.cpu.vx(ctx.index_x), VY | VX);
 }
 
 #[test_context(Context)]
@@ -45,7 +48,7 @@ fn test_and_reg(ctx: &mut Context) {
     };
 
     assert!(matches!(ctx.chip8.execute(instr), Ok(ExecResult::Advance)));
-    assert_eq!(*ctx.chip8.cpu.vx(ctx.index_x), 0xC4 & 0x4F);
+    assert_eq!(*ctx.chip8.cpu.vx(ctx.index_x), VY & VX);
 }
 
 #[test_context(Context)]
@@ -57,7 +60,7 @@ fn test_xor_reg(ctx: &mut Context) {
     };
 
     assert!(matches!(ctx.chip8.execute(instr), Ok(ExecResult::Advance)));
-    assert_eq!(*ctx.chip8.cpu.vx(ctx.index_x), 0xC4 ^ 0x4F);
+    assert_eq!(*ctx.chip8.cpu.vx(ctx.index_x), VY ^ VX);
 }
 
 #[test_context(Context)]
@@ -69,7 +72,7 @@ fn test_rshift(ctx: &mut Context) {
     };
 
     assert!(matches!(ctx.chip8.execute(instr), Ok(ExecResult::Advance)));
-    assert_eq!(*ctx.chip8.cpu.vx(ctx.index_x), 0x4F >> 1);
+    assert_eq!(*ctx.chip8.cpu.vx(ctx.index_x), VX >> 1);
     assert_eq!(*ctx.chip8.cpu.vx(Chip8::VF), 1);
 }
 
@@ -82,10 +85,10 @@ fn test_lshift(ctx: &mut Context) {
     };
 
     assert!(matches!(ctx.chip8.execute(instr), Ok(ExecResult::Advance)));
-    assert_eq!(*ctx.chip8.cpu.vx(ctx.index_x), 0x4F << 1);
+    assert_eq!(*ctx.chip8.cpu.vx(ctx.index_x), VX << 1);
     assert_eq!(*ctx.chip8.cpu.vx(Chip8::VF), 0);
 
     assert!(matches!(ctx.chip8.execute(instr), Ok(ExecResult::Advance)));
-    assert_eq!(*ctx.chip8.cpu.vx(ctx.index_x), 0x4F << 2);
+    assert_eq!(*ctx.chip8.cpu.vx(ctx.index_x), VX << 2);
     assert_eq!(*ctx.chip8.cpu.vx(Chip8::VF), 1);
 }
