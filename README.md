@@ -12,7 +12,7 @@ I decided to take on this project as a learning experience both in Rust and Low-
 cargo run --release /path/to/rom
 ```
 
-You can download any Chip8-compatible rom and run it using a command above. (IN DEVELOPMENT)
+You can download any Chip8-compatible rom and run it using a command above.
 
 I highly recommend to pay a visit (and drop a star) to this repo full of roms:
 ![click](https://github.com/loktar00/chip8/tree/master/roms)
@@ -32,3 +32,5 @@ I highly recommend to pay a visit (and drop a star) to this repo full of roms:
 - [x] Implement Emulator window
 - [ ] Document and check for typos
 - [x] Run Space Invaders/Pong
+- [ ] Add sound
+- [ ] Fix render lagging
