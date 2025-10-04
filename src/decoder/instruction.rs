@@ -199,7 +199,7 @@ pub enum Instruction {
         /// register index for VX
         x: Index,
     },
-    /// FX29, I = sprite_addr[VX]
+    /// FX29, I = sprite_addr\[VX\]
     SetSpriteAddr {
         /// register index for VX
         x: Index,
