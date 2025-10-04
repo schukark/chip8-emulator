@@ -29,6 +29,6 @@ I highly recommend to pay a visit (and drop a star) to this repo full of roms:
 - [x] Implement Keypad
 - [ ] Test the machine as a whole
 - [x] Add logging
-- [ ] Implement Emulator window
+- [x] Implement Emulator window
 - [ ] Document and check for typos
-- [ ] Run Space Invaders/Pong
+- [x] Run Space Invaders/Pong
