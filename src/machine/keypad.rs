@@ -89,11 +89,14 @@ mod tests {
     fn test_simple_press_release() {
         let mut keypad = Keypad::new();
         keypad.set_key_state(0xC, true).unwrap();
+        assert_eq!(keypad.any_pressed().unwrap(), 0xC);
+
         keypad.set_key_state(0xD, true).unwrap();
         keypad.set_key_state(0xC, false).unwrap();
 
         assert!(!keypad.is_pressed(0xC).unwrap());
         assert!(keypad.is_pressed(0xD).unwrap());
+        assert_eq!(keypad.any_pressed().unwrap(), 0xD);
     }
 
     #[test]

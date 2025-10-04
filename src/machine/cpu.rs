@@ -229,7 +229,7 @@ mod tests {
     }
 
     mod program_counter {
-        use crate::machine::cpu::Cpu;
+        use crate::machine::cpu::{Cpu, CpuError};
 
         #[test]
         fn test_advance() {
@@ -249,12 +249,15 @@ mod tests {
         #[test]
         fn test_out_of_range() {
             let mut cpu = Cpu::new();
-            assert!(cpu.set_program_counter(0x1000).is_err());
+            assert!(matches!(
+                cpu.set_program_counter(0x1000),
+                Err(CpuError::PCOutOfRange)
+            ));
         }
     }
 
     mod address {
-        use crate::machine::cpu::Cpu;
+        use crate::machine::cpu::{Cpu, CpuError};
 
         #[test]
         fn test_set() {
@@ -273,12 +276,15 @@ mod tests {
         #[test]
         fn test_out_of_range() {
             let mut cpu = Cpu::new();
-            assert!(cpu.set_address(0x1000).is_err());
+            assert!(matches!(
+                cpu.set_address(0x1000),
+                Err(CpuError::AddressOutOfRange)
+            ));
         }
     }
 
     mod stack {
-        use crate::machine::cpu::Cpu;
+        use crate::machine::cpu::{Cpu, CpuError};
 
         #[test]
         fn test_correct_opeation() {
@@ -298,13 +304,16 @@ mod tests {
             for i in 0..16 {
                 assert!(cpu.stack_push(i as u16).is_ok());
             }
-            assert!(cpu.stack_push(0x100).is_err());
+            assert!(matches!(
+                cpu.stack_push(0x100),
+                Err(CpuError::StackLimitReached)
+            ));
         }
 
         #[test]
         fn test_empty_error() {
             let mut cpu = Cpu::new();
-            assert!(cpu.stack_pop().is_err());
+            assert!(matches!(cpu.stack_pop(), Err(CpuError::StackEmpty)));
         }
     }
 
