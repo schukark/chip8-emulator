@@ -33,4 +33,4 @@ I highly recommend to pay a visit (and drop a star) to this repo full of roms:
 - [ ] Document and check for typos
 - [x] Run Space Invaders/Pong
 - [ ] Add sound
-- [ ] Fix render lagging
+- [x] Fix render lagging
