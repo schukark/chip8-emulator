@@ -183,6 +183,11 @@ impl Cpu {
         self.delay_timer
     }
 
+    /// Get sound timer value
+    pub fn sound_timer(&self) -> u8 {
+        self.sound_timer
+    }
+
     /// Set delay timer
     pub fn set_delay_timer(&mut self, value: u8) {
         debug!("Delay timer was set to ", value);

@@ -371,6 +371,11 @@ impl Chip8 {
         self.cpu.tick_timers()
     }
 
+    /// Check if the sound should be played
+    pub fn is_sound_playing(&self) -> bool {
+        self.cpu.sound_timer() > 0
+    }
+
     /// Forward the keypresses to the keypad
     pub fn set_key_state(&mut self, key: u8, state: bool) -> Result<(), Chip8Error> {
         self.keypad.set_key_state(key, state).map_err(|x| x.into())
