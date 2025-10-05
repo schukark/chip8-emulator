@@ -32,5 +32,5 @@ I highly recommend to pay a visit (and drop a star) to this repo full of roms:
 - [x] Implement Emulator window
 - [ ] Document and check for typos
 - [x] Run Space Invaders/Pong
-- [ ] Add sound
+- [x] Add sound
 - [x] Fix render lagging
