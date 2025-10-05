@@ -47,6 +47,8 @@ pub struct Chip8 {
     display: Display,
     /// Chip8 keypad
     keypad: Keypad,
+    /// Flag that shows if any redraw is actually needed
+    dirty_flag: bool,
 }
 
 /// Enum of all possible errors with chip8 instance
@@ -89,6 +91,7 @@ impl Chip8 {
             memory: Memory::new(),
             display: Display::new(),
             keypad: Keypad::new(),
+            dirty_flag: false,
         }
     }
 
@@ -262,6 +265,7 @@ impl Chip8 {
                 let collision = self.display.draw_sprite(&sprite, vx, vy)?;
 
                 *self.cpu.vx(Chip8::VF) = collision as u8;
+                self.dirty_flag = true;
 
                 ExecResult::Advance
             }
@@ -353,8 +357,13 @@ impl Chip8 {
     }
 
     /// Get a snapshot of current display state to render
-    pub fn display_snapshot(&self) -> &[[bool; 64]; 32] {
-        self.display.state()
+    pub fn display_snapshot(&mut self) -> Option<&[[bool; 64]; 32]> {
+        if self.dirty_flag {
+            self.dirty_flag = false;
+            Some(self.display.state())
+        } else {
+            None
+        }
     }
 
     /// Tick timers by one if possible

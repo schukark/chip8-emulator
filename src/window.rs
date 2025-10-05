@@ -2,6 +2,7 @@
 
 use std::{
     env::Args,
+    hash::{DefaultHasher, Hash, Hasher},
     sync::Arc,
     time::{Duration, Instant},
 };
@@ -41,6 +42,8 @@ struct App<'a> {
     last_ticked: Instant,
     /// Last time the cpu cycle happened
     last_cpu_cycle: Instant,
+    /// Hash of the last frame to consider rerendering
+    prev_display_hash: Option<u64>,
 }
 
 impl<'a> App<'a> {
@@ -53,6 +56,7 @@ impl<'a> App<'a> {
             chip8,
             last_ticked: Instant::now(),
             last_cpu_cycle: Instant::now(),
+            prev_display_hash: None,
         }
     }
 }
@@ -77,7 +81,7 @@ impl<'a> ApplicationHandler for App<'a> {
 
     fn about_to_wait(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
         let now = Instant::now();
-        let next_frame = now + TIMER_INTERVAL;
+        let next_frame = now + CPU_CYCLE_INTERVAL;
         event_loop.set_control_flow(winit::event_loop::ControlFlow::WaitUntil(next_frame));
 
         if let Some(window) = &self.window {
@@ -98,12 +102,28 @@ impl<'a> ApplicationHandler for App<'a> {
                 self.window = None;
                 self.window_id = None;
                 self.pixels = None;
+                self.prev_display_hash = None;
             }
             WindowEvent::RedrawRequested => {
                 let now = Instant::now();
                 if now.duration_since(self.last_ticked) >= TIMER_INTERVAL {
                     self.chip8.tick_timers();
                     self.last_ticked = now;
+
+                    let display_snapshot = self.chip8.display_snapshot().cloned();
+                    if let Some(display_state) = display_snapshot {
+                        let mut h = DefaultHasher::new();
+                        display_state.hash(&mut h);
+                        let cur_hash = h.finish();
+
+                        if self.prev_display_hash.is_none()
+                            || cur_hash != self.prev_display_hash.unwrap()
+                        {
+                            self.draw_display(display_state);
+                            let _ = self.pixels.as_ref().unwrap().render();
+                            self.prev_display_hash = Some(cur_hash);
+                        }
+                    }
                 }
 
                 if now.duration_since(self.last_cpu_cycle) >= CPU_CYCLE_INTERVAL {
@@ -113,35 +133,8 @@ impl<'a> ApplicationHandler for App<'a> {
                     self.last_cpu_cycle = now;
                 }
 
-                let frame = self.pixels.as_mut().unwrap().frame_mut();
-
-                let chip8_display_state = self.chip8.display_snapshot();
-                let scale_x = 10;
-                let scale_y = 10;
-
-                for (y, row) in chip8_display_state.iter().enumerate() {
-                    for (x, &on) in row.iter().enumerate() {
-                        let color = if on {
-                            [0xFF, 0xFF, 0xFF, 0xFF]
-                        } else {
-                            [0x00, 0x00, 0x00, 0xFF]
-                        };
-
-                        for dy in 0..scale_y {
-                            for dx in 0..scale_x {
-                                let px = x * scale_x + dx;
-                                let py = y * scale_y + dy;
-                                let i = (py * 640 + px) * 4;
-                                frame[i..i + 4].copy_from_slice(&color);
-                            }
-                        }
-                    }
-                }
-
-                let _ = self.pixels.as_ref().unwrap().render();
-                event_loop.set_control_flow(ControlFlow::WaitUntil(now + TIMER_INTERVAL));
-
-                self.window.as_ref().unwrap().request_redraw();
+                event_loop
+                    .set_control_flow(ControlFlow::WaitUntil(Instant::now() + CPU_CYCLE_INTERVAL));
             }
             WindowEvent::KeyboardInput {
                 device_id: _,
@@ -155,6 +148,45 @@ impl<'a> ApplicationHandler for App<'a> {
                 }
             }
             _ => (),
+        }
+    }
+}
+
+impl<'a> App<'a> {
+    /// Decay factor for the phosphor persitence
+    const DECAY: f32 = 0.25;
+
+    /// Redraw the display depending on the current chip8 display state
+    fn draw_display(&mut self, display_state: [[bool; 64]; 32]) {
+        let scale_x = 10;
+        let scale_y = 10;
+
+        let frame = self.pixels.as_mut().unwrap().frame_mut();
+
+        for (y, row) in display_state.iter().enumerate() {
+            for (x, &on) in row.iter().enumerate() {
+                let color = if on {
+                    [0xFF, 0xFF, 0xFF, 0xFF]
+                } else {
+                    [0x00, 0x00, 0x00, 0xFF]
+                };
+
+                for dy in 0..scale_y {
+                    for dx in 0..scale_x {
+                        let px = x * scale_x + dx;
+                        let py = y * scale_y + dy;
+                        let i = (py * 640 + px) * 4;
+
+                        // Phosphor persistence
+                        for c in 0..3 {
+                            let old = frame[i + c] as f32;
+                            frame[i + c] =
+                                ((old * App::DECAY) + color[c] as f32 * (1.0 - App::DECAY)) as u8;
+                        }
+                        frame[i + 3] = 0xFF; // Alpha channel
+                    }
+                }
+            }
         }
     }
 }
