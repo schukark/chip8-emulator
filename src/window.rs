@@ -3,11 +3,12 @@
 use std::{
     env::Args,
     hash::{DefaultHasher, Hash, Hasher},
-    sync::Arc,
+    sync::{Arc, Mutex},
     time::{Duration, Instant},
 };
 
 use pixels::{Pixels, SurfaceTexture};
+use rodio::{OutputStream, OutputStreamBuilder, Sink, Source, source::SineWave};
 use tklog::{info, trace};
 use winit::{
     application::ApplicationHandler,
@@ -44,6 +45,10 @@ struct App<'a> {
     last_cpu_cycle: Instant,
     /// Hash of the last frame to consider rerendering
     prev_display_hash: Option<u64>,
+    /// Stream handle for audio
+    stream_handle: Option<OutputStream>,
+    /// Audio sink
+    sound_sink: Option<Arc<Mutex<Sink>>>,
 }
 
 impl<'a> App<'a> {
@@ -57,6 +62,8 @@ impl<'a> App<'a> {
             last_ticked: Instant::now(),
             last_cpu_cycle: Instant::now(),
             prev_display_hash: None,
+            stream_handle: None,
+            sound_sink: None,
         }
     }
 }
@@ -65,18 +72,34 @@ impl<'a> ApplicationHandler for App<'a> {
     fn resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
         info!("Window created!");
 
+        // Window creation
         let window_attributes = WindowAttributes::default()
             .with_title("Chip8 emulator")
             .with_inner_size(winit::dpi::LogicalSize::new(640, 320));
-        let window = Arc::new(event_loop.create_window(window_attributes).unwrap());
+        let window = Arc::new(
+            event_loop
+                .create_window(window_attributes)
+                .expect("create application window"),
+        );
 
         self.window_id = Some(window.id());
         self.window = Some(window.clone());
 
+        // Rendering initialization
         let surface_texture = SurfaceTexture::new(640, 320, window);
-        let pixels = Pixels::new(640, 320, surface_texture).unwrap();
+        let pixels =
+            Pixels::new(640, 320, surface_texture).expect("create a surface texture to draw");
 
         self.pixels = Some(pixels);
+
+        // Audio initialization
+        let stream_handle =
+            OutputStreamBuilder::open_default_stream().expect("open default audio stream");
+        let sink = Sink::connect_new(stream_handle.mixer());
+        sink.pause();
+
+        self.stream_handle = Some(stream_handle);
+        self.sound_sink = Some(Arc::new(Mutex::new(sink)));
     }
 
     fn about_to_wait(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
@@ -106,35 +129,18 @@ impl<'a> ApplicationHandler for App<'a> {
             }
             WindowEvent::RedrawRequested => {
                 let now = Instant::now();
+
                 if now.duration_since(self.last_ticked) >= TIMER_INTERVAL {
-                    self.chip8.tick_timers();
-                    self.last_ticked = now;
-
-                    let display_snapshot = self.chip8.display_snapshot().cloned();
-                    if let Some(display_state) = display_snapshot {
-                        let mut h = DefaultHasher::new();
-                        display_state.hash(&mut h);
-                        let cur_hash = h.finish();
-
-                        if self.prev_display_hash.is_none()
-                            || cur_hash != self.prev_display_hash.unwrap()
-                        {
-                            self.draw_display(display_state);
-                            let _ = self.pixels.as_ref().unwrap().render();
-                            self.prev_display_hash = Some(cur_hash);
-                        }
-                    }
+                    self.tick_timers_and_sound(now);
                 }
 
                 if now.duration_since(self.last_cpu_cycle) >= CPU_CYCLE_INTERVAL {
-                    self.chip8
-                        .step()
-                        .expect("Failed to execute chip8 instruction");
-                    self.last_cpu_cycle = now;
+                    self.run_cpu_cycle(now);
                 }
 
-                event_loop
-                    .set_control_flow(ControlFlow::WaitUntil(Instant::now() + CPU_CYCLE_INTERVAL));
+                self.maybe_redraw_display();
+
+                event_loop.set_control_flow(ControlFlow::WaitUntil(now + CPU_CYCLE_INTERVAL));
             }
             WindowEvent::KeyboardInput {
                 device_id: _,
@@ -155,6 +161,24 @@ impl<'a> ApplicationHandler for App<'a> {
 impl<'a> App<'a> {
     /// Decay factor for the phosphor persitence
     const DECAY: f32 = 0.25;
+
+    /// Determine if the current display is different from the last,
+    /// and if yes, rerender
+    fn maybe_redraw_display(&mut self) {
+        if let Some(display_state) = self.chip8.display_snapshot().cloned() {
+            let mut hasher = DefaultHasher::new();
+            display_state.hash(&mut hasher);
+            let cur_hash = hasher.finish();
+
+            if self.prev_display_hash != Some(cur_hash) {
+                self.draw_display(display_state);
+                if let Some(pixels) = &self.pixels {
+                    let _ = pixels.render();
+                }
+                self.prev_display_hash = Some(cur_hash);
+            }
+        }
+    }
 
     /// Redraw the display depending on the current chip8 display state
     fn draw_display(&mut self, display_state: [[bool; 64]; 32]) {
@@ -188,6 +212,50 @@ impl<'a> App<'a> {
                 }
             }
         }
+    }
+
+    /// Tick the cpu timers and play sound if needed
+    fn tick_timers_and_sound(&mut self, now: Instant) {
+        self.last_ticked = now;
+        self.chip8.tick_timers();
+
+        if !self.chip8.is_sound_playing() {
+            self.pause_sound();
+            return;
+        }
+
+        self.play_sound();
+    }
+
+    /// Play the sound
+    fn play_sound(&self) {
+        if let Some(lock) = &self.sound_sink
+            && let Ok(sink) = lock.lock()
+        {
+            if sink.is_paused() {
+                sink.play();
+            }
+            if sink.empty() {
+                sink.append(SineWave::new(440.0).amplify(0.2).repeat_infinite());
+            }
+        }
+    }
+
+    /// Pause the current sound
+    fn pause_sound(&self) {
+        if let Some(lock) = &self.sound_sink
+            && let Ok(sink) = lock.lock()
+        {
+            sink.pause();
+        }
+    }
+
+    /// Run one cpu cycle
+    fn run_cpu_cycle(&mut self, now: Instant) {
+        if let Err(e) = self.chip8.step() {
+            eprintln!("CHIP-8 execution error: {e}");
+        }
+        self.last_cpu_cycle = now;
     }
 }
 
