@@ -2,19 +2,7 @@ use crate::types::SpriteHeight;
 
 use super::*;
 use ndarray::{ArrayView2, array, s};
-use test_context::{TestContext, test_context};
-
-struct Context {
-    chip8: Chip8,
-}
-
-impl TestContext for Context {
-    fn setup() -> Self {
-        Self {
-            chip8: Chip8::new(),
-        }
-    }
-}
+use test_context::test_context;
 
 #[test_context(Context)]
 #[test]
