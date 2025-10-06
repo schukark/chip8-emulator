@@ -21,6 +21,9 @@ jobs:
         override: true
     - uses: actions/checkout@v4
     - uses: Swatinem/rust-cache@v2
+      with:
+        cache-targets: true
+        cache-on-failure: true
     
     - name: Install apt packages
       run: sudo apt-get install g++ pkg-config libx11-dev libasound2-dev libudev-dev libxkbcommon-x11-0
@@ -40,8 +43,11 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
-      
       - uses: Swatinem/rust-cache@v2
+        with:
+          cache-targets: true
+          cache-on-failure: true
+      
       - name: Install apt packages
         run: sudo apt-get install g++ pkg-config libx11-dev libasound2-dev libudev-dev libxkbcommon-x11-0
       
@@ -50,6 +56,7 @@ jobs:
       - run: echo ${{ steps.coverage.outputs.documented }}
       
       - name: Create documentation coverage
+        if: github.ref == 'refs/heads/master'
         uses: schneegans/dynamic-badges-action@v1.7.0
         with:
           auth: ${{ secrets.GIST_SECRET }}
@@ -73,6 +80,9 @@ jobs:
           components: llvm-tools-preview
           override: true
       - uses: Swatinem/rust-cache@v2
+        with:
+          cache-targets: true
+          cache-on-failure: true
       
       - name: Install apt packages
         run: sudo apt-get install g++ pkg-config libx11-dev libasound2-dev libudev-dev libxkbcommon-x11-0
@@ -91,3 +101,18 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           file: lcov.info
+  
+  deploy_docs:
+    name: Deploy github pages docs
+    runs-on: ubuntu_latest
+    needs: build
+
+    steps:
+    - name: Build docs
+      run: cargo doc --no-deps
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./target/doc
