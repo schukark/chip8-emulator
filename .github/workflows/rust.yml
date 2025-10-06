@@ -38,6 +38,9 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
+      - uses: Swatinem/rust-cache@v2
+      - name: Install apt packages
+        run: sudo apt-get install g++ pkg-config libx11-dev libasound2-dev libudev-dev libxkbcommon-x11-0
       - id: coverage
         uses: bewee/rustdoc-coverage-action@v1
       - run: echo ${{ steps.coverage.outputs.documented }}
