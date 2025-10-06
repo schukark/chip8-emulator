@@ -4,11 +4,13 @@ use crate::{machine::*, types::Address};
 
 mod bitop;
 mod cond;
+mod display;
 mod flow;
 mod math;
 mod mem;
 
-const V0: Index = unsafe { Index::new_unchecked(0) };
+const V0: Index = unsafe { Index::new_unchecked(0x0) };
+const VF: Index = unsafe { Index::new_unchecked(0xF) };
 
 #[test]
 fn test_unsupported_instruction_error() {
