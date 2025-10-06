@@ -18,7 +18,7 @@ use crate::window::run_app;
 /// Setup logging
 fn log_init() {
     LOG.set_console(false) // Enables console logging
-        .set_level(LEVEL::Trace) // Sets the log level; default is Debug
+        .set_level(LEVEL::Info) // Sets the log level; default is Debug
         .set_format(Format::LevelFlag | Format::Time | Format::ShortFileName) // Defines structured log output with chosen details
         .set_cutmode_by_size("logs/tklogsize.txt", 1 << 22, 10, true) // Cuts logs by file size (4 MB), keeps 10 backups, compresses backups
         .set_formatter("{level}{time} {file}:{message}\n"); // Customizes log output format; default is "{level}{time} {file}:{message}"
