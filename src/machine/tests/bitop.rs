@@ -1,6 +1,4 @@
 use super::*;
-use test_context::{TestContext, test_context};
-
 struct Context {
     chip8: Chip8,
     index_x: Index,

@@ -2,7 +2,6 @@ use crate::types::SpriteHeight;
 
 use super::*;
 use ndarray::{ArrayView2, array, s};
-use test_context::test_context;
 
 #[test_context(Context)]
 #[test]
