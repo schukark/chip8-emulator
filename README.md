@@ -2,9 +2,11 @@
 
 Chip8 emulator implemenation in Rust
 
-![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/schukark/f285310eb2aa23028f1ffa5b6a740d14/raw/doc-coverage.json)
+## Badges
 
-[![Coverage Status](https://coveralls.io/repos/github/schukark/chip8-emulator/badge.svg?branch=master)](https://coveralls.io/github/schukark/chip8-emulator?branch=master)
+|   |   |   |
+| - | - | - |
+| ![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/schukark/f285310eb2aa23028f1ffa5b6a740d14/raw/doc-coverage.json) | [![Coverage Status](https://coveralls.io/repos/github/schukark/chip8-emulator/badge.svg?branch=master)](https://coveralls.io/github/schukark/chip8-emulator?branch=master) | [![Rust](https://github.com/schukark/chip8-emulator/actions/workflows/rust.yml/badge.svg?branch=master)](https://github.com/schukark/chip8-emulator/actions/workflows/rust.yml) |
 
 ## Details
 
