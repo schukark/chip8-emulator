@@ -110,6 +110,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Install apt packages
+      run: sudo apt-get install g++ pkg-config libx11-dev libasound2-dev libudev-dev libxkbcommon-x11-0
+
     - name: Build docs
       run: cargo doc --no-deps
 
