@@ -27,7 +27,7 @@ I highly recommend to pay a visit (and drop a star) to this repo full of roms:
   - [x] Test Keypad
 - [x] Implement Display in code
 - [x] Implement Keypad
-- [ ] Test the machine as a whole
+- [x] Test the machine as a whole
 - [x] Add logging
 - [x] Implement Emulator window
 - [ ] Document and check for typos
