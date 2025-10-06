@@ -1,0 +1,9 @@
+(function() {
+    var implementors = Object.fromEntries([["chip8_emulator",[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/default/trait.Default.html\" title=\"trait core::default::Default\">Default</a> for <a class=\"struct\" href=\"chip8_emulator/machine/cpu/struct.Cpu.html\" title=\"struct chip8_emulator::machine::cpu::Cpu\">Cpu</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/default/trait.Default.html\" title=\"trait core::default::Default\">Default</a> for <a class=\"struct\" href=\"chip8_emulator/machine/display/struct.Display.html\" title=\"struct chip8_emulator::machine::display::Display\">Display</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/default/trait.Default.html\" title=\"trait core::default::Default\">Default</a> for <a class=\"struct\" href=\"chip8_emulator/machine/keypad/struct.Keypad.html\" title=\"struct chip8_emulator::machine::keypad::Keypad\">Keypad</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/default/trait.Default.html\" title=\"trait core::default::Default\">Default</a> for <a class=\"struct\" href=\"chip8_emulator/machine/memory/struct.Memory.html\" title=\"struct chip8_emulator::machine::memory::Memory\">Memory</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/default/trait.Default.html\" title=\"trait core::default::Default\">Default</a> for <a class=\"struct\" href=\"chip8_emulator/machine/struct.Chip8.html\" title=\"struct chip8_emulator::machine::Chip8\">Chip8</a>"]]]]);
+    if (window.register_implementors) {
+        window.register_implementors(implementors);
+    } else {
+        window.pending_implementors = implementors;
+    }
+})()
+//{"start":57,"fragment_lengths":[1512]}

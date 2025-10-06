@@ -1,0 +1,2 @@
+createSrcSidebar('[["chip8_emulator",["",[["decoder",[],["instruction.rs","macros.rs","mod.rs"]],["machine",[],["cpu.rs","display.rs","keypad.rs","memory.rs","mod.rs"]],["types",[],["mod.rs"]]],["main.rs","window.rs"]]]]');
+//{"start":19,"fragment_lengths":[200]}
