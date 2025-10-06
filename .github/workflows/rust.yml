@@ -18,8 +18,8 @@ jobs:
     - uses: actions-rs/toolchain@v1
       with:
         toolchain: nightly
-        components: rustfmt, clippy # Optional: specify desired components
-        override: true # Set this to true to make nightly the default for the current directory
+        components: rustfmt, clippy
+        override: true
     - uses: actions/checkout@v4
     - uses: Swatinem/rust-cache@v2
     - name: Install apt packages
@@ -28,3 +28,16 @@ jobs:
       run: cargo build --verbose
     - name: Run tests
       run: cargo test --verbose -- --test-threads=1
+
+  print_doc_coverage:
+    name: Print documentation coverage
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+      - id: coverage
+        uses: bewee/rustdoc-coverage-action@v1
+      - run: echo ${{ steps.coverage.outputs.documented }}
