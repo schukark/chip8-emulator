@@ -55,7 +55,7 @@ jobs:
           auth: ${{ secrets.GIST_SECRET }}
           gistID: f285310eb2aa23028f1ffa5b6a740d14
           filename: doc-coverage.json
-          label: Doc coverage
+          label: Docs
           message: ${{ steps.coverage.outputs.documented }}
           color: green
           forceUpdate: true
