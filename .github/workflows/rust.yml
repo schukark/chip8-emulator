@@ -11,9 +11,7 @@ env:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions-rs/toolchain@v1
       with:
@@ -30,7 +28,7 @@ jobs:
       run: cargo test --verbose -- --test-threads=1
 
   print_doc_coverage:
-    name: Print documentation coverage
+    name: Generate doc-cov badge
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -48,9 +46,10 @@ jobs:
         uses: schneegans/dynamic-badges-action@v1.7.0
         with:
           auth: ${{ secrets.GIST_SECRET }}
-          gistID: <gist-ID>
+          gistID: f285310eb2aa23028f1ffa5b6a740d14
           filename: doc-coverage.json
           label: Doc coverage
           message: ${{ steps.coverage.outputs.documented }}
           color: green
+          forceUpdate: true
 
