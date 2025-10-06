@@ -9,6 +9,7 @@ mod bitop;
 mod cond;
 mod display;
 mod flow;
+mod keypad;
 mod math;
 mod mem;
 
