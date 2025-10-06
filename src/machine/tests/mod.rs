@@ -12,6 +12,7 @@ mod flow;
 mod keypad;
 mod math;
 mod mem;
+mod timers;
 
 const V0: Index = unsafe { Index::new_unchecked(0x0) };
 const VF: Index = unsafe { Index::new_unchecked(0xF) };
