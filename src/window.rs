@@ -51,6 +51,7 @@ struct App<'a> {
     sound_sink: Option<Arc<Mutex<Sink>>>,
 }
 
+#[cfg_attr(coverage_nightly, coverage(off))]
 impl<'a> App<'a> {
     /// Create an application struct from a ready chip8 instance
     fn from_chip8(chip8: Chip8) -> Self {
@@ -68,6 +69,7 @@ impl<'a> App<'a> {
     }
 }
 
+#[cfg_attr(coverage_nightly, coverage(off))]
 impl<'a> ApplicationHandler for App<'a> {
     fn resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
         info!("Window created!");

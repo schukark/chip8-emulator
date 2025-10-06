@@ -25,6 +25,7 @@ fn log_init() {
         .set_formatter("{level}{time} {file}:{message}\n"); // Customizes log output format; default is "{level}{time} {file}:{message}"
 }
 
+#[cfg_attr(coverage_nightly, coverage(off))]
 fn main() {
     let args = std::env::args();
     log_init();
