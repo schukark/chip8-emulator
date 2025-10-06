@@ -47,5 +47,5 @@ fn test_sound_timer_tick(ctx: &mut Context) {
 
     ctx.chip8.tick_timers();
     assert_eq!(ctx.chip8.cpu.sound_timer(), 0x0);
-    assert!(!ctx.chip8.is_sound_playing());re
+    assert!(!ctx.chip8.is_sound_playing());
 }
