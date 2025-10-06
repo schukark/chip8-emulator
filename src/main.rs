@@ -14,6 +14,7 @@ use tklog::{Format, LEVEL, LOG};
 
 use crate::window::run_app;
 
+#[cfg_attr(coverage_nightly, coverage(off))]
 #[allow(clippy::borrow_interior_mutable_const)] // As per docs of tklog, this is correct
 /// Setup logging
 fn log_init() {

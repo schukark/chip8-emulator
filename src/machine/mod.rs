@@ -74,6 +74,7 @@ pub enum Chip8Error {
     UnsupportedInstruction,
 }
 
+#[cfg_attr(coverage_nightly, coverage(off))]
 impl Default for Chip8 {
     fn default() -> Self {
         Self::new()
