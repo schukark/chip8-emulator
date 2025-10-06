@@ -2,11 +2,16 @@
 
 Chip8 emulator implemenation in Rust
 
-## Badges
+<details>
+<summary>Badges</summary>
 
-|   |   |   |
-| - | - | - |
-| ![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/schukark/f285310eb2aa23028f1ffa5b6a740d14/raw/doc-coverage.json) | [![Coverage Status](https://coveralls.io/repos/github/schukark/chip8-emulator/badge.svg?branch=master)](https://coveralls.io/github/schukark/chip8-emulator?branch=master) | [![Rust](https://github.com/schukark/chip8-emulator/actions/workflows/rust.yml/badge.svg?branch=master)](https://github.com/schukark/chip8-emulator/actions/workflows/rust.yml) |
+![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/schukark/f285310eb2aa23028f1ffa5b6a740d14/raw/doc-coverage.json)
+[![Coverage Status](https://coveralls.io/repos/github/schukark/chip8-emulator/badge.svg?branch=master)](https://coveralls.io/github/schukark/chip8-emulator?branch=master)
+[![Rust](https://github.com/schukark/chip8-emulator/actions/workflows/rust.yml/badge.svg?branch=master)](https://github.com/schukark/chip8-emulator/actions/workflows/rust.yml)
+
+![Rust version](https://img.shields.io/badge/Rust_version-1.92_nightly-blue)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+</details>
 
 ## Details
 
@@ -20,10 +25,17 @@ cargo run --release /path/to/rom
 
 You can download any Chip8-compatible rom and run it using a command above.
 
-I highly recommend to pay a visit (and drop a star) to this repo full of roms:
-![click](https://github.com/loktar00/chip8/tree/master/roms)
+## References
 
-## TBD
+- [Cowgod’s Chip-8 Technical Reference](http://devernay.free.fr/hacks/chip8/C8TECH10.HTM)
+- [CHIP-8 Wikipedia](https://en.wikipedia.org/wiki/CHIP-8)
+- [Loktar00’s ROM collection](https://github.com/loktar00/chip8/tree/master/roms)
+
+## Documentation
+
+[Documentation](https://schukark.github.io/chip8-emulator/)
+
+## Roadmap
 
 - [x] Write better unit tests
   - [x] Test Instructions fully
@@ -36,7 +48,8 @@ I highly recommend to pay a visit (and drop a star) to this repo full of roms:
 - [x] Test the machine as a whole
 - [x] Add logging
 - [x] Implement Emulator window
-- [ ] Document and check for typos
 - [x] Run Space Invaders/Pong
 - [x] Add sound
 - [x] Fix render lagging
+- [x] Document and check for typos
+- [ ] Prettify the repo
