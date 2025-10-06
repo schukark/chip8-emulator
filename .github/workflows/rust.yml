@@ -108,6 +108,8 @@ jobs:
     needs: build
 
     steps:
+    - uses: actions/checkout@v4
+
     - name: Build docs
       run: cargo doc --no-deps
 
