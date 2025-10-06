@@ -17,7 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Install apt packages
-      run: sudo apt-get install libwayland-dev libxkbcommon-dev
+      run: sudo apt-get install g++ pkg-config libasound2-dev libudev-dev libwayland-dev libxkbcommon-dev
     - name: Build
       run: cargo build --verbose
     - name: Run tests
