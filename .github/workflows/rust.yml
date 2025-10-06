@@ -44,3 +44,13 @@ jobs:
       - id: coverage
         uses: bewee/rustdoc-coverage-action@v1
       - run: echo ${{ steps.coverage.outputs.documented }}
+      - name: Create documentation coverage
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: <gist-ID>
+          filename: doc-coverage.json
+          label: Doc coverage
+          message: ${{ steps.coverage.outputs.documented }}
+          color: green
+

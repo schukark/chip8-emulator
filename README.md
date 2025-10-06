@@ -2,6 +2,10 @@
 
 Chip8 implemenation in Rust
 
+## Badge
+
+![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/schukark/f285310eb2aa23028f1ffa5b6a740d14/raw/doc-coverage.json)
+
 ## Details
 
 I decided to take on this project as a learning experience both in Rust and Low-level emulation.

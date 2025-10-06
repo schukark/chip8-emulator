@@ -4,3 +4,4 @@ proptest-regressions
 logs/
 lcov.info
 coverage_report/
+gist-token
