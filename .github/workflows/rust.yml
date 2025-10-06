@@ -61,7 +61,7 @@ jobs:
           forceUpdate: true
     
   test_coverage:
-    name: Generate doc-cov badge
+    name: Generate test-cov badge
     needs: build
     runs-on: ubuntu-latest
     
