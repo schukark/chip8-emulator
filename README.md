@@ -13,6 +13,15 @@ Chip8 emulator implemenation in Rust
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 </details>
 
+## Demo
+
+<details>
+<summary> Video Demo</summary>
+
+![video demo](videos/demo.gif)
+
+</details>
+
 ## Details
 
 I decided to take on this project as a learning experience both in Rust and Low-level emulation.
